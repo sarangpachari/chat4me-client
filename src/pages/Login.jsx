@@ -2,7 +2,11 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowRightLong } from "react-icons/fa6";
-import { generateOtpAPI, verifyOtpAPI } from "../services/allAPI";
+import {
+  createUsernameAPI,
+  generateOtpAPI,
+  verifyOtpAPI,
+} from "../services/allAPI";
 
 const Login = () => {
   const [step, setStep] = useState(0);
@@ -43,7 +47,7 @@ const Login = () => {
     };
     try {
       const response = await verifyOtpAPI(reqBody);
-      if (response.status === 200) {
+      if (response.status === 202) {
         alert("OTP verification successful!");
         handleNext();
       } else if (response.status === 201) {
@@ -55,9 +59,7 @@ const Login = () => {
           console.log("Token not received from the server");
         }
       } else if (response.status === 400) {
-        alert("Invalid OTP");
-      } else if (response.status === 401) {
-        alert("OTP expired !");
+        alert("Invalid OTP / Expired OTP");
       }
     } catch (error) {
       alert("OTP verification failed.");
@@ -66,12 +68,16 @@ const Login = () => {
 
   //USERNAME CHECKING AND CREATING
   const handleUsernameSubmit = async () => {
+    let reqBody = {
+      email: email,
+      username: username,
+    };
     try {
-      const response = await axios.post("/api/check-username", { username });
+      const response = await createUsernameAPI(reqBody);
       if (response.status === 201) {
         alert("Username is available!");
         navigate("/home");
-      } else {
+      } else if (response.status === 400) {
         alert("Username is taken. Try another.");
       }
     } catch (error) {
@@ -97,8 +103,8 @@ const Login = () => {
         ))}
       </div>
 
-      <div className="flex items-center w-full max-w-4xl min-h-72 bg-white rounded-lg shadow-lg">
-        <div className="flex lg:hidden flex-col w-12 bg-gray-100 rounded-l-lg p-2 items-center">
+      <div className="flex items-center w-full max-w-xl bg-white rounded-lg shadow-lg">
+        <div className="flex lg:hidden flex-col w-12 rounded-l-lg p-2 items-center">
           {steps.map((_, index) => (
             <button
               key={index}

@@ -16,3 +16,6 @@ export const verifyOtpAPI = async (reqBody) => {
 };
 
 //CREATE USERNAME API
+export const createUsernameAPI = async (reqBody) => {
+  return await commonAPI("POST", `${SERVER_BASE_URL}/auth/create-username`, reqBody);
+};
