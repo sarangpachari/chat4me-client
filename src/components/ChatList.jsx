@@ -1,11 +1,33 @@
-import React from 'react';
-import { Search } from 'lucide-react';
-import ChatPreview from './ChatPreview';
-
-
+import React, { useState, useEffect } from "react";
+import { Search } from "lucide-react";
+import ChatPreview from "./ChatPreview";
+// import { getAllMessagedUser } from "../service/allApi";
 
 function ChatList() {
-  
+  const [users, setUsers] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
+
+  // Fetch messaged users
+  const fetchMessagedUsers = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("User not logged in");
+      return;
+    }
+
+    const reqHeader = { Authorization: token };
+
+    try {
+      const result = await getAllMessagedUser(reqHeader);
+      setUsers(result.data || []);
+    } catch (error) {
+      console.error("Error fetching users", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMessagedUsers();
+  }, []);
 
   return (
     <div className="flex flex-col h-full">
@@ -20,19 +42,20 @@ function ChatList() {
         </div>
       </div>
       <div className="flex-1 overflow-y-auto">
-      <ChatPreview
-          name="Argo"
-          avatar="https://preview.redd.it/can-someone-find-me-the-full-picture-of-luffy-v0-h2pzsqum3vwc1.png?width=1400&format=png&auto=webp&s=874056ae179de44d273e13328f104a1eb1f9c50d"
-          lastMessage="Sure! I can show you tomorrow..."
-          timestamp="09:44"
-        />
-        <ChatPreview
-          name="Naruto"
-          avatar="https://i.redd.it/which-naruto-form-stronger-v0-1w1zh7cajuoc1.jpg?width=602&format=pjpg&auto=webp&s=5d5b41ba43483827f50d945de73a863b83e0b874"
-          lastMessage="Hey!!"
-          timestamp="09:44"
-        />
-   
+        {users.length > 0 ? (
+          users.map((user) => (
+            <ChatPreview
+              key={user.id}
+              name={user.name}
+              avatar={user.avatar}
+              timestamp={user.lastMessageTime}
+              active={selectedChat === user.id}
+              onClick={() => setSelectedChat(user.id)}
+            />
+          ))
+        ) : (
+          <p className="text-center text-gray-500 mt-4">No chats available</p>
+        )}
       </div>
     </div>
   );
