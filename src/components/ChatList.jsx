@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
-import { Search } from "lucide-react";
-import ChatPreview from "./ChatPreview";
-import { chatPreviewDataContext } from "../contexts/DataContextShare";
+import React from 'react';
+import { Search } from 'lucide-react';
+import ChatPreview from './ChatPreview';
+
+
 
 function ChatList() {
-  //CONTEXTS
-  const {chatPreviewData,setChatPreviewData} = useContext(chatPreviewDataContext)
+  
 
   return (
     <div className="flex flex-col h-full">
@@ -20,7 +20,7 @@ function ChatList() {
         </div>
       </div>
       <div className="flex-1 overflow-y-auto">
-        <ChatPreview
+      <ChatPreview
           name="Argo"
           avatar="https://preview.redd.it/can-someone-find-me-the-full-picture-of-luffy-v0-h2pzsqum3vwc1.png?width=1400&format=png&auto=webp&s=874056ae179de44d273e13328f104a1eb1f9c50d"
           lastMessage="Sure! I can show you tomorrow..."
@@ -32,6 +32,7 @@ function ChatList() {
           lastMessage="Hey!!"
           timestamp="09:44"
         />
+   
       </div>
     </div>
   );
