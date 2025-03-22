@@ -61,6 +61,7 @@ function ChatList() {
               timestamp={user.lastMessageTime}
               active={selectedChat === user.id}
               onClick={() => setSelectedChat(user.id)}
+              
             />
           ))
         ) : (
