@@ -1,7 +1,9 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaArrowRightLong } from "react-icons/fa6";
+import { FaArrowRightLong, FaCircleUser } from "react-icons/fa6";
+import { MdEmail } from "react-icons/md";
+import { PiNumpad } from "react-icons/pi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -103,8 +105,8 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white text-gray-900 p-4">
-      <div className="hidden lg:flex justify-center space-x-8 w-full max-w-2xl pb-2 mb-4">
+    <div className="h-lvh flex flex-col items-center justify-center bg-gradient-to-b from-amber-50 to-red-50 text-gray-900 p-4">
+      <div className="hidden lg:flex justify-center space-x-8 w-full max-w-2xl pb-4 mb-4">
         {steps.map((label, index) => (
           <button
             key={index}
@@ -120,7 +122,7 @@ const Login = () => {
         ))}
       </div>
 
-      <div className="flex items-center w-full max-w-xl bg-white rounded-lg shadow-lg">
+      <div className="flex items-center w-full h-72 max-w-xl bg-white rounded-lg border-t-6 border-t-yellow-500 shadow-md">
         <div className="flex lg:hidden flex-col w-12 rounded-l-lg p-2 items-center">
           {steps.map((_, index) => (
             <button
@@ -155,9 +157,11 @@ const Login = () => {
 
           {step === 1 && (
             <div>
-              <h2 className="md:text-2xl text-sm font-semibold mb-4">
-                Enter Your Email
+              <h2 className="md:text-2xl text-sm font-semibold mb-2 flex items-center gap-2">
+              <MdEmail size={25} />
+                Provide Your E-mail
               </h2>
+              <p className="text-gray-400 text-xs mb-6">Privacy Notice: Your email will remain confidential and won’t be shared with anyone.</p>
               <input
                 type="email"
                 placeholder="Email"
@@ -176,9 +180,12 @@ const Login = () => {
 
           {step === 2 && (
             <div>
-              <h2 className="md:text-2xl text-sm font-semibold mb-4">
+              <h2 className="md:text-2xl text-sm font-semibold mb-4 flex items-center gap-2">
+              <PiNumpad size={25} />
                 Enter OTP
               </h2>
+              <p className="text-gray-400 text-xs mb-6">Security Notice: Your OTP is valid for 5 minutes only.</p>
+
               <input
                 type="number"
                 placeholder="OTP"
@@ -197,9 +204,11 @@ const Login = () => {
 
           {step === 3 && (
             <div>
-              <h2 className="md:text-2xl text-sm font-semibold mb-4">
-                Choose a Username
+              <h2 className="md:text-2xl text-sm font-semibold mb-4 flex items-center gap-2">
+              <FaCircleUser size={25} />
+                Choose a username
               </h2>
+              <p className="text-gray-400 text-xs mb-6">Your username must be unique and will stay with you forever.</p>
               <input
                 type="text"
                 placeholder="Username"
