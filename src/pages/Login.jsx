@@ -2,11 +2,14 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   createUsernameAPI,
   generateOtpAPI,
   verifyOtpAPI,
 } from "../services/allAPI";
+import { isEmail } from "validator";
 
 const Login = () => {
   const [step, setStep] = useState(0);
@@ -23,65 +26,79 @@ const Login = () => {
 
   //EMAIL SUBMITTING
   const handleEmailSubmit = async () => {
-    let reqBody = {
-      email: email,
-    };
-    try {
-      const response = await generateOtpAPI(reqBody);
-      if (response.status === 200) {
-        alert("OTP sent successfully!");
-        handleNext();
-      } else if (response.status === 500) {
-        alert("Failed to send OTP. Please try again.");
+    if (!email) {
+      toast.warning("Please Enter your email");
+    } else if (isEmail(email)) {
+      let reqBody = {
+        email: email,
+      };
+      try {
+        const response = await generateOtpAPI(reqBody);
+        if (response.status === 200) {
+          toast.success("OTP sent successfully");
+          handleNext();
+        } else if (response.status === 500) {
+          toast.error("Failed to send OTP. Please try again.");
+        }
+      } catch (error) {
+        toast.error("Failed to send OTP. Please try again.");
       }
-    } catch (error) {
-      alert("Failed to send OTP. Please try again.");
+    } else if (!isEmail(email)) {
+      toast.error("Invalid Email Address");
     }
   };
 
   //OTP SUBMITTING
   const handleOtpSubmit = async () => {
-    let reqBody = {
-      email: email,
-      otp: otp,
-    };
-    try {
-      const response = await verifyOtpAPI(reqBody);
-      if (response.status === 202) {
-        alert("OTP verification successful!");
-        handleNext();
-      } else if (response.status === 201) {
-        alert("Login successful!");
-        if (response.data.token) {
-          localStorage.setItem("token", response.data.token);
-          navigate("/home");
-        } else {
-          console.log("Token not received from the server");
+    if (!otp) {
+      toast.warning("Please Enter OTP");
+    } else if (otp) {
+      let reqBody = {
+        email: email,
+        otp: otp,
+      };
+      try {
+        const response = await verifyOtpAPI(reqBody);
+        if (response.status === 202) {
+          toast.success("OTP verification successful!");
+          handleNext();
+        } else if (response.status === 201) {
+          toast.success("Login successful!");
+          if (response.data.token) {
+            localStorage.setItem("token", response.data.token);
+            navigate("/home");
+          } else {
+            console.log("Token not received from the server");
+          }
+        } else if (response.status === 400) {
+          toast.error("Invalid OTP / Expired OTP");
         }
-      } else if (response.status === 400) {
-        alert("Invalid OTP / Expired OTP");
+      } catch (error) {
+        toast.error("OTP verification failed.");
       }
-    } catch (error) {
-      alert("OTP verification failed.");
     }
   };
 
   //USERNAME CHECKING AND CREATING
   const handleUsernameSubmit = async () => {
-    let reqBody = {
-      email: email,
-      username: username,
-    };
-    try {
-      const response = await createUsernameAPI(reqBody);
-      if (response.status === 201) {
-        alert("Username is available!");
-        navigate("/home");
-      } else if (response.status === 400) {
-        alert("Username is taken. Try another.");
+    if (!username) {
+      toast.warning("Please enter a username");
+    } else if (username) {
+      let reqBody = {
+        email: email,
+        username: username,
+      };
+      try {
+        const response = await createUsernameAPI(reqBody);
+        if (response.status === 201) {
+          toast.success("Username is available!");
+          navigate("/home");
+        } else if (response.status === 400) {
+          toast.warning("Username is taken. Try another.");
+        }
+      } catch (error) {
+        toast.error("Error checking username.");
       }
-    } catch (error) {
-      alert("Error checking username.");
     }
   };
 
@@ -200,6 +217,8 @@ const Login = () => {
           )}
         </div>
       </div>
+
+      <ToastContainer />
     </div>
   );
 };
