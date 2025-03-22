@@ -1,4 +1,4 @@
-const SERVER_BASE_URL = "http://localhost:3000"
+const SERVER_BASE_URL = "https://chat4me-server.onrender.com"
 
 
 
