@@ -1,11 +1,13 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import ChatPreview from "./ChatPreview";
 import { useChatContext } from "../contexts/ChatProvider";
 import { searchUserAPI } from "../services/allAPI";
 import { chatPreviewDataContext } from "../contexts/DataContextShare";
+import { getAllMessagedUserApi } from "../service/allApi";
 
 function ChatList() {
+
   const { allChatPreviewData, setAllChatPreviewData } = useContext(
     chatPreviewDataContext
   );
@@ -35,6 +37,41 @@ function ChatList() {
     setLoading(false);
   };
 
+  // CONTEXTS
+  const { chatPreviewData, setChatPreviewData } = useContext(chatPreviewDataContext);
+
+  const [users, setUsers] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [loading, setLoading] = useState(true); 
+
+  // hello  world
+
+  // Fetch messaged users
+  const fetchMessagedUsers = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("User not logged in");
+      setLoading(false);
+      return;
+    }
+
+    const reqHeader = { Authorization: `${token}` };
+
+    try {
+      const result = await getAllMessagedUserApi(reqHeader);
+      setUsers(result?.data ?? []);
+    } catch (error) {
+      console.error("Error fetching users", error);
+    } finally {
+      setLoading(false); 
+    }
+  };
+
+  useEffect(() => {
+    fetchMessagedUsers();
+  }, []);
+
+
   return (
     <div className="flex flex-col h-full">
       <div className="p-4">
@@ -51,8 +88,8 @@ function ChatList() {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {loading && <p className="text-center text-gray-500">Searching...</p>}
 
+        {loading && <p className="text-center text-gray-500">Searching...</p>}
         {/* Show search results if searchQuery is active */}
         {searchQuery
           ? searchResults.map((user) => (
@@ -78,6 +115,22 @@ function ChatList() {
                 onClick={() => setAllChatPreviewData(chat.receiverId)}
               />
             ))}
+        {loading ? (
+          <p className="text-center text-gray-500 mt-4">Loading chats...</p>
+        ) : users.length > 0 ? (
+          users.map((user) => (
+            <ChatPreview
+              key={user.id}
+              name={user.name}
+              avatar={user.avatar}
+              timestamp={user.lastMessageTime}
+              active={selectedChat === user.id}
+              onClick={() => setSelectedChat(user.id)}
+            />
+          ))
+        ) : (
+          <p className="text-center text-gray-500 mt-4">No chats available</p>
+        )}
       </div>
     </div>
   );
