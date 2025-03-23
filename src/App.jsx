@@ -3,6 +3,7 @@ import "./App.css";
 import Pnf from "./pages/Pnf";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
+import Account from "./pages/Account";
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
           <Route path="*" element={<Pnf />} />
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/account" element={<Home />} />
+          <Route path="/account" element={<Account />} />
         </Routes>
       </Router>
     </>
