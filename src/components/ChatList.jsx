@@ -4,7 +4,6 @@ import ChatPreview from "./ChatPreview";
 import { useChatContext } from "../contexts/ChatProvider";
 import { searchUserAPI } from "../services/allAPI";
 import { chatPreviewDataContext } from "../contexts/DataContextShare";
-import { getAllMessagedUserApi } from "../service/allApi";
 
 function ChatList() {
 
@@ -38,13 +37,10 @@ function ChatList() {
   };
 
   // CONTEXTS
-  const { chatPreviewData, setChatPreviewData } = useContext(chatPreviewDataContext);
+
 
   const [users, setUsers] = useState([]);
-  const [selectedChat, setSelectedChat] = useState(null);
-  const [loading, setLoading] = useState(true); 
 
-  // hello  world
 
   // Fetch messaged users
   const fetchMessagedUsers = async () => {
