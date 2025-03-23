@@ -12,6 +12,7 @@ function App() {
           <Route path="*" element={<Pnf />} />
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/account" element={<Home />} />
         </Routes>
       </Router>
     </>
