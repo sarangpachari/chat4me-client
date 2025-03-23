@@ -1,26 +1,38 @@
-import React from 'react';
+import React from "react";
+import moment from "moment";
 
-function MessageBubble({ text, timestamp, sender, image }) {
-  const isUser = sender === 'user';
+function MessageBubble({ text, timestamp, senderId, loggedInUserId, image }) {
+  const isSentByUser = senderId === loggedInUserId; // Compare sender ID with logged-in user
+
+  if (!text && !image) return null;
+
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex ${isSentByUser ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-3 sm:px-4 py-2 shadow-sm ${
-          isUser
-            ? 'bg-blue-500 text-white rounded-br-none'
-            : 'bg-white text-gray-800 rounded-bl-none'
+        className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-3 sm:px-4 py-2 shadow-md ${
+          isSentByUser
+            ? "bg-blue-500 text-white rounded-br-none" // Sent messages (right, blue)
+            : "bg-gray-200 text-black rounded-bl-none" // Received messages (left, gray)
         }`}
       >
+        {/* Show image if present */}
         {image && (
-          <img 
-            src={image} 
-            alt="Sent content" 
+          <img
+            src={image}
+            alt="Sent content"
             className="max-w-full h-auto rounded-lg mb-2"
           />
         )}
+        {/* Show text message */}
         {text && <p className="text-sm sm:text-base">{text}</p>}
-        <p className={`text-[10px] sm:text-xs mt-1 ${isUser ? 'text-blue-100' : 'text-gray-400'}`}>
-          {timestamp}
+
+        {/* Time display */}
+        <p
+          className={`text-[10px] sm:text-xs mt-1 ${
+            isSentByUser ? "text-blue-200" : "text-gray-600"
+          }`}
+        >
+          {timestamp ? moment(timestamp).format("hh:mm A") : "Time Unknown"}
         </p>
       </div>
     </div>

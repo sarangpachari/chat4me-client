@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowRightLong, FaCircleUser } from "react-icons/fa6";
@@ -12,6 +12,7 @@ import {
   verifyOtpAPI,
 } from "../services/allAPI";
 import { isEmail } from "validator";
+import { loggedUserDataContext } from "../contexts/DataContextShare";
 
 const Login = () => {
   const [step, setStep] = useState(0);
@@ -19,6 +20,9 @@ const Login = () => {
   const [otp, setOtp] = useState("");
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
+
+  // CONTEXT DATA SHARING FOR USER DATA
+  const {loggedUserData, setLoggedUserData} = useContext(loggedUserDataContext)
 
   //TAB NAMES
   const steps = ["Welcome", "Email", "OTP", "Username"];
@@ -68,6 +72,9 @@ const Login = () => {
           toast.success("Login successful!");
           if (response.data.token) {
             localStorage.setItem("token", response.data.token);
+            if (response.data) {
+              setLoggedUserData(response.data.user)
+            }
             navigate("/home");
           } else {
             console.log("Token not received from the server");
@@ -94,6 +101,9 @@ const Login = () => {
         const response = await createUsernameAPI(reqBody);
         if (response.status === 201) {
           toast.success("Username is available!");
+          if (response.data) {
+            setLoggedUserData(response.data.newUser)
+          }
           navigate("/home");
         } else if (response.status === 400) {
           toast.warning("Username is taken. Try another.");
