@@ -1,18 +1,27 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useState } from "react";
 
-export const chatPreviewDataContext = createContext()
+export const chatPreviewDataContext = createContext();
+export const loggedUserDataContext = createContext();
 
-const DataContextShare = ({children}) => {
-
-    const [chatPreviewData,setChatPreviewData] = useState([])
+const DataContextShare = ({ children }) => {
+  const [allChatPreviewData, setAllChatPreviewData] = useState([]);
+  const [loggedUserData, setLoggedUserData] = useState(null);
 
   return (
     <>
-        <chatPreviewDataContext.Provider value={{chatPreviewData,setChatPreviewData}}>
-            {children}
+      {/* LOGGED USER DATA */}
+      <loggedUserDataContext.Provider
+        value={{ loggedUserData, setLoggedUserData }}
+      >
+        {/* CHAT PREVIEW DATA SHARING */}
+        <chatPreviewDataContext.Provider
+          value={{ allChatPreviewData, setAllChatPreviewData }}
+        >
+          {children}
         </chatPreviewDataContext.Provider>
+      </loggedUserDataContext.Provider>
     </>
-  )
-}
+  );
+};
 
-export default DataContextShare
+export default DataContextShare;
