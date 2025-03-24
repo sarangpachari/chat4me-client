@@ -6,8 +6,8 @@ import { loggedUserDataContext } from "../contexts/DataContextShare";
 
 function SideBar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   // CONTEXTS
   const { loggedUserData, setLoggedUserData } = useContext(
