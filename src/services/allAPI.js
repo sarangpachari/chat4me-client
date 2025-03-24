@@ -50,3 +50,8 @@ export const getMyAccountDetailsAPI = async (myUserId) => {
     {},
   );
 };
+
+//UPDATE USERNAME API
+export const updateUsernameAPI = async (reqBody) => {
+  return await commonAPI("PUT",`${SERVER_BASE_URL}/user/update-Username`,reqBody)
+}
