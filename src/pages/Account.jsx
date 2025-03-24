@@ -1,8 +1,40 @@
-import React from 'react';
-import {  User, Mail, Camera, LogOut, Home, } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { User, Mail, Camera, LogOut, Home } from "lucide-react";
+import { Link } from "react-router-dom";
+import { getMyAccountDetailsAPI } from "../services/allAPI";
 
 function Account() {
+  const [myDetails, setMyDetails] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchMyAccountDetails = async () => {
+    setLoading(true);
+    const myData = JSON.parse(localStorage.getItem("user"));
+    const myId = myData._id;
+    
+    try {
+      const result = await getMyAccountDetailsAPI(myId);
+      if (result.status == 200) {
+        setMyDetails(result.data);
+      } else if (result.status == 400) {
+        console.log("User not found");
+      } else if (result.status == 500) {
+        console.log("Server Error");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMyAccountDetails();
+  }, []);
+
+  console.log(myDetails);
+  
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -10,11 +42,11 @@ function Account() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">My Account</h1>
-            <Link to={'/home'}>
-            <button className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
-              <Home size={20} />
-              <span>Back to Home</span>
-            </button>
+            <Link to={"/home"}>
+              <button className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                <Home size={20} />
+                <span>Back to Home</span>
+              </button>
             </Link>
           </div>
         </div>
@@ -39,7 +71,9 @@ function Account() {
                     </button>
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold text-gray-900">Argo </h2>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      {myDetails?.username}
+                    </h2>
                   </div>
                 </div>
               </div>
@@ -49,7 +83,7 @@ function Account() {
                   <User className="text-gray-400" size={20} />
                   <div className="flex-grow">
                     <p className="text-sm text-gray-500">User Name</p>
-                    <p className="text-gray-900">Argo</p>
+                    <p className="text-gray-900">{myDetails?.username}</p>
                   </div>
                 </div>
 
@@ -57,7 +91,7 @@ function Account() {
                   <Mail className="text-gray-400" size={20} />
                   <div className="flex-grow">
                     <p className="text-sm text-gray-500">Email</p>
-                    <p className="text-gray-900">argo@example.com</p>
+                    <p className="text-gray-900">{myDetails?.email}</p>
                   </div>
                 </div>
               </div>
@@ -67,7 +101,9 @@ function Account() {
           {/* Settings Section */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Settings</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Settings
+              </h3>
               <nav className="space-y-2">
                 <button className="w-full flex items-center space-x-3 p-3 text-red-600 rounded-lg hover:bg-red-50 transition">
                   <LogOut className="text-red-600" size={20} />
@@ -79,7 +115,7 @@ function Account() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Account
+export default Account;
