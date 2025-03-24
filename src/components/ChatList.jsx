@@ -9,21 +9,14 @@ import {
 } from "../contexts/DataContextShare";
 
 function ChatList() {
-  const { allChatPreviewData, setAllChatPreviewData } = useContext(
-    chatPreviewDataContext
-  );
-  const { chatPreviewData, setSelectedChat } = useChatContext();
+  const { setAllChatPreviewData } = useContext(chatPreviewDataContext);
+  const { setSelectedChat } = useChatContext();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
+  const { loggedUserData } = useContext(loggedUserDataContext);
 
-  // CONTEXTS
-  const { loggedUserData, setLoggedUserData } = useContext(
-    loggedUserDataContext
-  );
-
-  // Function to handle search input change
   const handleSearch = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -44,32 +37,25 @@ function ChatList() {
     setLoading(false);
   };
 
-  // Fetch messaged users
   const fetchMessagedUsers = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
       console.error("User not logged in");
-      setLoading(false);
       return;
     }
     const loggedUserId = loggedUserData?._id;
-
     const reqHeader = { Authorization: token };
-
+    
     if (loggedUserId) {
       try {
         const result = await allMessagedUsersAPI(loggedUserId, reqHeader);
-        if (result.status == 200) {
+        if (result.status === 200) {
           setUsers(result?.data?.users);
-        }else if (result.status == 400) {
-          console.log("No chats found !Its a new user.")
-        }else if (result.status == 500) {
-          console.log("Server Error !");
+        } else {
+          console.log("No chats found or server error.");
         }
       } catch (error) {
         console.error("Error fetching users", error);
-      } finally {
-        setLoading(false);
       }
     }
   };
@@ -79,7 +65,7 @@ function ChatList() {
   }, []);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="relative flex flex-col h-full">
       <div className="p-4">
         <div className="relative">
           <input
@@ -93,11 +79,11 @@ function ChatList() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        {loading && <p className="text-center text-gray-500">Searching...</p>}
-        {/* Show search results if searchQuery is active */}
-        {searchQuery
-          ? searchResults.map((user) => (
+      {searchQuery && (
+        <div className="absolute top-16 left-0 w-full bg-white shadow-lg rounded-lg z-10 max-h-60 overflow-y-auto">
+          {loading && <p className="text-center text-gray-500 p-2">Searching...</p>}
+          {searchResults.length > 0 ? (
+            searchResults.map((user) => (
               <ChatPreview
                 key={user._id}
                 name={user.username}
@@ -107,30 +93,31 @@ function ChatList() {
                 onClick={() => {
                   setAllChatPreviewData(user);
                   setSelectedChat(user);
+                  setSearchQuery("");
                 }}
               />
             ))
-          : chatPreviewData.map((chat) => (
-              <ChatPreview
-                key={chat._id}
-                name={chat.receiverName}
-                avatar={chat.receiverAvatar}
-                lastMessage={chat.chat}
-                timestamp={moment(chat.createdAt).format("hh:mm A")}
-                onClick={() => setAllChatPreviewData(chat.receiverId)}
-              />
-            ))}
-        {loading ? (
+          ) : (
+            <p className="text-center text-gray-500 p-2">No users found</p>
+          )}
+        </div>
+      )}
+
+      <div className="flex-1 overflow-y-auto">
+        {loading && !searchQuery ? (
           <p className="text-center text-gray-500 mt-4">Loading chats...</p>
         ) : users.length > 0 ? (
           users.map((user) => (
             <ChatPreview
-              key={user.id}
-              name={user.name}
+              key={user._id}
+              name={user.username}
               avatar={user.avatar}
-              timestamp={user.lastMessageTime}
-              active={selectedChat === user.id}
-              onClick={() => setSelectedChat(user.id)}
+              lastMessage="Tap to chat"
+              timestamp=""
+              onClick={() => {
+                setAllChatPreviewData(user);
+                setSelectedChat(user);
+              }}
             />
           ))
         ) : (

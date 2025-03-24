@@ -3,18 +3,22 @@ import ChatHeader from "./ChatHeader";
 import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
 import { useChatContext } from "../contexts/ChatProvider";
-import { chatPreviewDataContext, loggedUserDataContext } from "../contexts/DataContextShare";
+import {
+  chatPreviewDataContext,
+  loggedUserDataContext,
+} from "../contexts/DataContextShare";
+
+import { FaRegMessage } from "react-icons/fa6";
 
 function ChatArea() {
   const { loggedUserData } = useContext(loggedUserDataContext);
   const { messages, selectedChat } = useChatContext(); // Use selectedChat from ChatContext
   const { allChatPreviewData, setAllChatPreviewData } = useContext(
-      chatPreviewDataContext
-    );
+    chatPreviewDataContext
+  );
 
-    console.log(allChatPreviewData);
-    
-  
+  console.log(allChatPreviewData);
+
   const messagesEndRef = useRef(null);
 
   const [filteredMessages, setFilteredMessages] = useState([]);
@@ -24,8 +28,10 @@ function ChatArea() {
       setFilteredMessages(
         messages.filter(
           (msg) =>
-            (msg.senderId === selectedChat._id && msg.receiverId === loggedUserData._id) ||
-            (msg.senderId === loggedUserData._id && msg.receiverId === selectedChat._id)
+            (msg.senderId === selectedChat._id &&
+              msg.receiverId === loggedUserData._id) ||
+            (msg.senderId === loggedUserData._id &&
+              msg.receiverId === selectedChat._id)
         )
       );
     }
@@ -37,29 +43,46 @@ function ChatArea() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Pass correct user details */}
-      <ChatHeader
-        name={selectedChat?.username}
-        avatar={selectedChat?.avatar}
-        userId={selectedChat?._id}
-      />
-
-      {/* Messages Section */}
-      <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-gray-50">
-        {filteredMessages.map((message) => (
-          <MessageBubble
-            key={message._id}
-            text={message.chat}
-            timestamp={message.createdAt} // Pass as-is, let moment handle it
-            senderId={message.senderId} // Use correct senderId
-            loggedInUserId={loggedUserData._id} // Pass logged-in user's ID
+      {selectedChat ? (
+        <>
+          {/* Pass correct user details */}
+          <ChatHeader
+            name={selectedChat?.username}
+            avatar={selectedChat?.avatar}
+            userId={selectedChat?._id}
           />
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
 
-      {/* Message Input */}
-      <MessageInput selectedUser={selectedChat} />
+          {/* Messages Section */}
+          <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-gray-50">
+            {filteredMessages.map((message) => (
+              <MessageBubble
+                key={message._id}
+                text={message.chat}
+                timestamp={message.createdAt}
+                senderId={message.senderId} 
+                loggedInUserId={loggedUserData._id}
+              />
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Message Input */}
+          <MessageInput selectedUser={selectedChat} />
+        </>
+      ) : (
+        <div className="flex flex-col h-full justify-center md:items-center items-start gap-5 p-4 bg-amber-300">
+          <div className="py-3">
+            <p className="text-4xl font-bold text-white">
+              Select a <span className="text-red-500">chat</span> to start{" "}
+              <span className="text-red-500">messaging</span>
+            </p>
+          </div>
+          <div className="flex gap-3 justify-start md:justify-center w-full">
+            <p className="text-white text-2xl font-bold">Hi,</p>
+            <FaRegMessage className="text-white animate-pulse" size={75} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
