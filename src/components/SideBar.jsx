@@ -1,10 +1,12 @@
 import React, { useContext, useState } from "react";
 import { User } from "lucide-react";
 import ChatList from "./ChatList";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { loggedUserDataContext } from "../contexts/DataContextShare";
 
+
 function SideBar() {
+  const navigate = useNavigate()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -13,10 +15,13 @@ function SideBar() {
   const { loggedUserData, setLoggedUserData } = useContext(
     loggedUserDataContext
   );
-
   const handleLogout = () => {
     console.log("User logged out");
     setIsLogoutModalOpen(false);
+    setLoggedUserData(null)
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    navigate('/')
   }
     
 

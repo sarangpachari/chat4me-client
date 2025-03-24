@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowRightLong, FaCircleUser } from "react-icons/fa6";
@@ -22,7 +22,9 @@ const Login = () => {
   const navigate = useNavigate();
 
   // CONTEXT DATA SHARING FOR USER DATA
-  const {loggedUserData, setLoggedUserData} = useContext(loggedUserDataContext)
+  const { loggedUserData, setLoggedUserData } = useContext(
+    loggedUserDataContext
+  );
 
   //TAB NAMES
   const steps = ["Welcome", "Email", "OTP", "Username"];
@@ -73,7 +75,9 @@ const Login = () => {
           if (response.data.token) {
             localStorage.setItem("token", response.data.token);
             if (response.data) {
-              setLoggedUserData(response.data.user)
+              setLoggedUserData(response.data.user);
+
+              localStorage.setItem("user", JSON.stringify(response.data.user));
             }
             navigate("/home");
           } else {
@@ -102,7 +106,8 @@ const Login = () => {
         if (response.status === 201) {
           toast.success("Username is available!");
           if (response.data) {
-            setLoggedUserData(response.data.newUser)
+            setLoggedUserData(response.data.newUser);
+            localStorage.setItem("user", JSON.stringify(response.data.newUser));
           }
           navigate("/home");
         } else if (response.status === 400) {
@@ -113,6 +118,7 @@ const Login = () => {
       }
     }
   };
+
 
   return (
     <div className="h-lvh flex flex-col items-center justify-center bg-gradient-to-b from-amber-50 to-red-50 text-gray-900 p-4">
@@ -168,10 +174,13 @@ const Login = () => {
           {step === 1 && (
             <div>
               <h2 className="md:text-2xl text-sm font-semibold mb-2 flex items-center gap-2">
-              <MdEmail size={25} />
+                <MdEmail size={25} />
                 Provide Your E-mail
               </h2>
-              <p className="text-gray-400 text-xs mb-6">Privacy Notice: Your email will remain confidential and won’t be shared with anyone.</p>
+              <p className="text-gray-400 text-xs mb-6">
+                Privacy Notice: Your email will remain confidential and won’t be
+                shared with anyone.
+              </p>
               <input
                 type="email"
                 placeholder="Email"
@@ -191,10 +200,12 @@ const Login = () => {
           {step === 2 && (
             <div>
               <h2 className="md:text-2xl text-sm font-semibold mb-4 flex items-center gap-2">
-              <PiNumpad size={25} />
+                <PiNumpad size={25} />
                 Enter OTP
               </h2>
-              <p className="text-gray-400 text-xs mb-6">Security Notice: Your OTP is valid for 5 minutes only.</p>
+              <p className="text-gray-400 text-xs mb-6">
+                Security Notice: Your OTP is valid for 5 minutes only.
+              </p>
 
               <input
                 type="number"
@@ -215,10 +226,12 @@ const Login = () => {
           {step === 3 && (
             <div>
               <h2 className="md:text-2xl text-sm font-semibold mb-4 flex items-center gap-2">
-              <FaCircleUser size={25} />
+                <FaCircleUser size={25} />
                 Choose a username
               </h2>
-              <p className="text-gray-400 text-xs mb-6">Your username must be unique and will stay with you forever.</p>
+              <p className="text-gray-400 text-xs mb-6">
+                Your username must be unique and will stay with you forever.
+              </p>
               <input
                 type="text"
                 placeholder="Username"
