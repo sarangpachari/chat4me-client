@@ -10,7 +10,7 @@ function Account() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">My Account</h1>
-            <Link>
+            <Link to={'/home'}>
             <button className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
               <Home size={20} />
               <span>Back to Home</span>
@@ -21,7 +21,7 @@ function Account() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Section */}
           <div className="lg:col-span-2">
@@ -77,7 +77,7 @@ function Account() {
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }
