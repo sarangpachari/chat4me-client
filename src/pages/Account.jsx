@@ -1,25 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { User, Mail, Camera, LogOut, Home } from "lucide-react";
+import { User, Mail, Camera, LogOut, Home, Check, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getMyAccountDetailsAPI } from "../services/allAPI";
+import { getMyAccountDetailsAPI, updateUsernameAPI } from "../services/allAPI";
 
 function Account() {
-  const [myDetails, setMyDetails] = useState([]);
+  const [myDetails, setMyDetails] = useState({});
   const [loading, setLoading] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
 
   const fetchMyAccountDetails = async () => {
     setLoading(true);
     const myData = JSON.parse(localStorage.getItem("user"));
-    const myId = myData._id;
-    
+    const myId = myData?._id;
     try {
       const result = await getMyAccountDetailsAPI(myId);
-      if (result.status == 200) {
+      if (result.status === 200) {
         setMyDetails(result.data);
-      } else if (result.status == 400) {
-        console.log("User not found");
-      } else if (result.status == 500) {
-        console.log("Server Error");
+      } else {
+        console.log("Error fetching details");
       }
     } catch (error) {
       console.error(error);
@@ -32,12 +31,27 @@ function Account() {
     fetchMyAccountDetails();
   }, []);
 
-  console.log(myDetails);
-  
+  const handleUpdateUsername = async () => {
+    try {
+      const myId = myDetails._id;
+      const reqBody = {
+        userId: myId,
+        newUsername: newUsername,
+      };
+      const result = await updateUsernameAPI(reqBody);
+      if (result.status === 200) {
+        setMyDetails({ ...myDetails, username: newUsername });
+        setEditing(false);
+      } else {
+        console.log("Update failed");
+      }
+    } catch (error) {
+      console.error("Error updating username", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
@@ -52,38 +66,55 @@ function Account() {
         </div>
       </header>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Profile Section */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <img
-                      src="https://comicbook.com/wp-content/uploads/sites/4/2024/11/One-Piece-Luffy.webp"
-                      alt="Profile"
-                      className="w-20 h-20 rounded-full object-cover"
-                    />
-                    <button className="absolute bottom-0 right-0 bg-blue-600 p-1.5 rounded-full text-white hover:bg-blue-700 transition">
-                      <Camera size={16} />
-                    </button>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {myDetails?.username}
-                    </h2>
-                  </div>
-                </div>
+              <div className="flex items-center space-x-4">
+                <img
+                  src="https://comicbook.com/wp-content/uploads/sites/4/2024/11/One-Piece-Luffy.webp"
+                  alt="Profile"
+                  className="w-20 h-20 rounded-full object-cover"
+                />
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-4 mt-4">
                 <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                   <User className="text-gray-400" size={20} />
                   <div className="flex-grow">
                     <p className="text-sm text-gray-500">User Name</p>
-                    <p className="text-gray-900">{myDetails?.username}</p>
+                    {editing ? (
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="text"
+                          value={newUsername}
+                          onChange={(e) => setNewUsername(e.target.value)}
+                          className="border px-2 py-1 rounded-lg"
+                        />
+                        <button
+                          onClick={handleUpdateUsername}
+                          className="text-green-600"
+                        >
+                          <Check size={20} />
+                        </button>
+                        <button
+                          onClick={() => setEditing(false)}
+                          className="text-red-600"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
+                    ) : (
+                      <p
+                        className="text-gray-900 cursor-pointer hover:underline"
+                        onClick={() => {
+                          setNewUsername(myDetails.username);
+                          setEditing(true);
+                        }}
+                      >
+                        {myDetails?.username}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -98,7 +129,6 @@ function Account() {
             </div>
           </div>
 
-          {/* Settings Section */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
