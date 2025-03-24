@@ -2,11 +2,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import ChatPreview from "./ChatPreview";
 import { useChatContext } from "../contexts/ChatProvider";
-import { searchUserAPI } from "../services/allAPI";
-import { chatPreviewDataContext } from "../contexts/DataContextShare";
+import { allMessagedUsersAPI, searchUserAPI } from "../services/allAPI";
+import {
+  chatPreviewDataContext,
+  loggedUserDataContext,
+} from "../contexts/DataContextShare";
 
 function ChatList() {
-
   const { allChatPreviewData, setAllChatPreviewData } = useContext(
     chatPreviewDataContext
   );
@@ -14,6 +16,12 @@ function ChatList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+
+  // CONTEXTS
+  const { loggedUserData, setLoggedUserData } = useContext(
+    loggedUserDataContext
+  );
 
   // Function to handle search input change
   const handleSearch = async (e) => {
@@ -36,12 +44,6 @@ function ChatList() {
     setLoading(false);
   };
 
-  // CONTEXTS
-
-
-  const [users, setUsers] = useState([]);
-
-
   // Fetch messaged users
   const fetchMessagedUsers = async () => {
     const token = localStorage.getItem("token");
@@ -50,23 +52,31 @@ function ChatList() {
       setLoading(false);
       return;
     }
+    const loggedUserId = loggedUserData?._id;
 
-    const reqHeader = { Authorization: `${token}` };
+    const reqHeader = { Authorization: token };
 
-    try {
-      const result = await getAllMessagedUserApi(reqHeader);
-      setUsers(result?.data ?? []);
-    } catch (error) {
-      console.error("Error fetching users", error);
-    } finally {
-      setLoading(false); 
+    if (loggedUserId) {
+      try {
+        const result = await allMessagedUsersAPI(loggedUserId, reqHeader);
+        if (result.status == 200) {
+          setUsers(result?.data?.users);
+        }else if (result.status == 400) {
+          console.log("No chats found !Its a new user.")
+        }else if (result.status == 500) {
+          console.log("Server Error !");
+        }
+      } catch (error) {
+        console.error("Error fetching users", error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
     fetchMessagedUsers();
   }, []);
-
 
   return (
     <div className="flex flex-col h-full">
@@ -84,7 +94,6 @@ function ChatList() {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-
         {loading && <p className="text-center text-gray-500">Searching...</p>}
         {/* Show search results if searchQuery is active */}
         {searchQuery

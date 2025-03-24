@@ -24,3 +24,8 @@ export const createUsernameAPI = async (reqBody) => {
 export const searchUserAPI = async (query) => {
   return await commonAPI("GET", `${SERVER_BASE_URL}/user/search-User?search=${query}`);
 };
+
+//MESSAGES USERS API
+export const allMessagedUsersAPI = async (loggedUserId,reqHeader) => {
+  return await commonAPI("GET", `${SERVER_BASE_URL}/user/get-Chat-Users/${loggedUserId}`,{},reqHeader)
+}
