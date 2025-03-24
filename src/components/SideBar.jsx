@@ -1,16 +1,21 @@
-import React, { useState } from 'react';
-import { User } from 'lucide-react';
-import ChatList from './ChatList';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from "react";
+import { User } from "lucide-react";
+import ChatList from "./ChatList";
+import { Link } from "react-router-dom";
+import { loggedUserDataContext } from "../contexts/DataContextShare";
 
 function SideBar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  // CONTEXTS
+  const { loggedUserData, setLoggedUserData } = useContext(
+    loggedUserDataContext
+  );
 
   const handleLogout = () => {
-    console.log('User logged out');
-    setIsLogoutModalOpen(false);
-  };
+    console.log("User logged out");
+ setIsLogoutModalOpen(false);
+  }
 
   return (
     <div className="flex flex-col h-full bg-gray-50 shadow-lg rounded-lg">
