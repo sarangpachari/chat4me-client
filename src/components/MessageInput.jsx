@@ -12,7 +12,6 @@ function MessageInput({ selectedUser }) {
 
 
   const {loggedUserData, setLoggedUserData} = useContext(loggedUserDataContext)
-  console.log("selectedUser",selectedUser);
   
 
   const [message, setMessage] = useState("");
