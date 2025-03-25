@@ -5,7 +5,7 @@ import SERVER_BASE_URL from "./serverURL";
 export const generateOtpAPI = async (reqBody) => {
   return await commonAPI(
     "POST",
-    `${SERVER_BASE_URL}/auth/generate-otp`,
+    `${SERVER_BASE_URL}/auth/generate-Otp`,
     reqBody
   );
 };

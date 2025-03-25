@@ -17,7 +17,6 @@ function ChatArea() {
     chatPreviewDataContext
   );
 
-  console.log(allChatPreviewData);
 
   const messagesEndRef = useRef(null);
 
