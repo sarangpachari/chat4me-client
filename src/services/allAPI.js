@@ -12,7 +12,7 @@ export const generateOtpAPI = async (reqBody) => {
 
 //VERIFY OTP API
 export const verifyOtpAPI = async (reqBody) => {
-  return await commonAPI("POST", `${SERVER_BASE_URL}/auth/verify-otp`, reqBody);
+  return await commonAPI("POST", `${SERVER_BASE_URL}/auth/verify-Otp`, reqBody);
 };
 
 //CREATE USERNAME API
