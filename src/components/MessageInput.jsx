@@ -26,8 +26,12 @@ function MessageInput({ selectedUser }) {
       const formData = new FormData();
       formData.append("file", file);
       
+      console.log("file",file);
+      
       const uploadRes = await axios.post(`${SERVER_BASE_URL}/upload`, formData);
       fileUrl = uploadRes.data.url;
+      console.log(fileUrl);
+      
     }
   
     const newMessage = { senderId: loggedUserData._id, receiverId: selectedUser._id, chat: message, image: fileUrl };
