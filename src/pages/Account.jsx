@@ -128,7 +128,7 @@ function Account() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center justify-center flex-col gap-5 space-x-4">
                 {/* Profile Image or User Icon */}
                 {myDetails?.profileImg ? (
                   <img
