@@ -3,10 +3,11 @@ import { User } from "lucide-react";
 import ChatList from "./ChatList";
 import { Link, useNavigate } from "react-router-dom";
 import { loggedUserDataContext } from "../contexts/DataContextShare";
-
+import { MdAccountCircle } from "react-icons/md";
+import { IoIosLogOut } from "react-icons/io";
 
 function SideBar() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -15,15 +16,15 @@ function SideBar() {
   const { loggedUserData, setLoggedUserData } = useContext(
     loggedUserDataContext
   );
+  const userData = JSON.parse(localStorage.getItem("user"));
   const handleLogout = () => {
     console.log("User logged out");
     setIsLogoutModalOpen(false);
-    setLoggedUserData(null)
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
-    navigate('/')
-  }
-    
+    setLoggedUserData(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
 
   return (
     <div className="flex flex-col h-full bg-gray-50 shadow-lg rounded-lg">
@@ -35,25 +36,42 @@ function SideBar() {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="p-2 rounded-full hover:bg-gray-200 transition focus:outline-none"
           >
-            <User className="w-6 h-6 text-gray-600" />
+            {userData?.profileImg ? (
+              <img
+                src={userData.profileImg}
+                alt="profile"
+                className="w-10 h-10 rounded-full"
+              />
+            ) : (
+              <User className="w-6 h-6 text-gray-600" />
+            )}
           </button>
 
           {/* Dropdown */}
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-44 bg-white shadow-lg rounded-lg ring-1 ring-gray-200 divide-y divide-gray-100 z-10">
               <ul className="text-sm text-gray-700">
+                <li className="text-blue-500 text-lg px-4 py-5 border-2 border-gray-200 bg-gray-100 rounded-lg hover:bg-gray-100">
+                  Hi,{" "}
+                  <span className="text-red-500">
+                    {userData?.username.charAt(0).toUpperCase() +
+                      userData?.username.slice(1)}
+                  </span>
+                </li>
                 <Link to="/account">
                   <li>
-                    <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                    <button className="flex items-center gap-2 w-full text-left px-4 py-4 hover:bg-gray-100">
+                      <MdAccountCircle size={20} />
                       My Account
                     </button>
                   </li>
                 </Link>
                 <li>
                   <button
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+                    className="flex items-center gap-2 w-full text-left px-4 py-4 hover:bg-gray-100 text-red-600"
                     onClick={() => setIsLogoutModalOpen(true)}
                   >
+                    <IoIosLogOut size={20} />
                     Logout
                   </button>
                 </li>
@@ -72,8 +90,12 @@ function SideBar() {
       {isLogoutModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center  bg-opacity-30 backdrop-blur-md">
           <div className="bg-white p-6 rounded-lg shadow-lg w-70">
-            <h2 className="text-lg font-semibold text-gray-800">Confirm Logout</h2>
-            <p className="text-gray-600 mt-2">Are you sure you want to log out?</p>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Confirm Logout
+            </h2>
+            <p className="text-gray-600 mt-2">
+              Are you sure you want to log out?
+            </p>
             <div className="mt-4 flex justify-end gap-2">
               <button
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"

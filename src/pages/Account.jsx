@@ -72,7 +72,7 @@ function Account() {
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center space-x-4">
                 <img
-                  src="https://comicbook.com/wp-content/uploads/sites/4/2024/11/One-Piece-Luffy.webp"
+                  src={myDetails.profileImg?myDetails.profileImg:""}
                   alt="Profile"
                   className="w-20 h-20 rounded-full object-cover"
                 />
