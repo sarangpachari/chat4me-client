@@ -1,21 +1,25 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { User } from "lucide-react";
 import ChatList from "./ChatList";
 import { Link, useNavigate } from "react-router-dom";
 import { loggedUserDataContext } from "../contexts/DataContextShare";
 import { MdAccountCircle } from "react-icons/md";
 import { IoIosLogOut } from "react-icons/io";
+import { getMyAccountDetailsAPI } from "../services/allAPI";
+import { changeProfilePictureResponseContext } from "../contexts/ResponseContextShare";
 
 function SideBar() {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-
+  const [myDetails, setMyDetails] = useState({});
   // CONTEXTS
   const { loggedUserData, setLoggedUserData } = useContext(
     loggedUserDataContext
   );
+  const {changeProfilePictureResponse, setChangeProfilePictureResponse} = useContext(changeProfilePictureResponseContext)
+
+
   const userData = JSON.parse(localStorage.getItem("user"));
   const handleLogout = () => {
     console.log("User logged out");
@@ -25,6 +29,27 @@ function SideBar() {
     localStorage.removeItem("user");
     navigate("/");
   };
+
+   const fetchMyAccountDetails = async () => {
+      
+      const myData = JSON.parse(localStorage.getItem("user"));
+      const myId = myData?._id;
+      try {
+        const result = await getMyAccountDetailsAPI(myId);
+        if (result.status === 200) {
+          setMyDetails(result.data);
+        } else {
+          console.log("Error fetching details");
+        }
+      } catch (error) {
+        console.error(error);
+      } 
+    };
+  
+    useEffect(() => {
+      fetchMyAccountDetails();
+    }, [changeProfilePictureResponse]);
+
 
   return (
     <div className="flex flex-col h-full bg-gray-50 shadow-lg rounded-lg">
@@ -36,9 +61,9 @@ function SideBar() {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="p-2 rounded-full hover:bg-gray-200 transition focus:outline-none"
           >
-            {userData?.profileImg ? (
+            {myDetails?.profileImg ? (
               <img
-                src={userData.profileImg}
+                src={myDetails.profileImg}
                 alt="profile"
                 className="w-10 h-10 rounded-full"
               />

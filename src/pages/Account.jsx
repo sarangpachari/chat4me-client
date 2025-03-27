@@ -1,7 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { User, Mail, Camera, LogOut, Home, Check, X, Upload } from "lucide-react";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  User,
+  Mail,
+  Camera,
+  LogOut,
+  Home,
+  Check,
+  X,
+  Upload,
+} from "lucide-react";
 import { Link } from "react-router-dom";
-import { getMyAccountDetailsAPI, updateUsernameAPI } from "../services/allAPI";
+import {
+  getMyAccountDetailsAPI,
+  updateUsernameAPI,
+  updateUserProfilePictureAPI,
+} from "../services/allAPI";
+import { changeProfilePictureResponseContext } from "../contexts/ResponseContextShare";
 
 function Account() {
   const [myDetails, setMyDetails] = useState({});
@@ -9,6 +23,7 @@ function Account() {
   const [editing, setEditing] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
+  const {changeProfilePictureResponse, setChangeProfilePictureResponse} = useContext(changeProfilePictureResponseContext)
 
   const fetchMyAccountDetails = async () => {
     setLoading(true);
@@ -44,12 +59,52 @@ function Account() {
         setMyDetails({ ...myDetails, username: newUsername });
         setEditing(false);
         console.log("Username changed !");
-        
       } else {
         console.log("Update failed");
       }
     } catch (error) {
       console.error("Error updating username", error);
+    }
+  };
+
+  //HANDLE UPDATE PROFILE PHOTO
+  const handleUploadImage = async () => {
+    if (!selectedImage) {
+      console.log("No image selected");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedImage); // Key must match backend `upload.single("profileImg")`
+
+    const token = localStorage.getItem("token");
+    if (token) {
+      const reqHeader = {
+        "Content-Type": "multipart/form-data",
+        Authorization: token,
+      };
+
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const id = user._id;
+
+        const result = await updateUserProfilePictureAPI(
+          id,
+          formData,
+          reqHeader
+        );
+
+        if (result.data.success) {
+          console.log("Image uploaded successfully:", result.data.profileImg);
+          setChangeProfilePictureResponse(result.data.profileImg)
+        } else {
+          console.log("Upload failed:", result.data.message);
+        }
+      } catch (error) {
+        console.error("Error uploading image", error);
+      }
+    }else{
+      console.log("No token found");
     }
   };
 
@@ -73,31 +128,35 @@ function Account() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center justify-center flex-col gap-5 space-x-4">
                 {/* Profile Image or User Icon */}
                 {myDetails?.profileImg ? (
-                    <img
-                      src={myDetails.profileImg}
-                      alt="Profile"
-                      className="w-28 h-28 rounded-full object-cover border-4 border-blue-600"
-                    />
-                  ) : (
-                    <div className="w-28 h-28 flex items-center justify-center bg-gray-200 rounded-full border-4 border-blue-600">
-                      <User size={40} className="text-gray-500" />
-                    </div>
-                  )}
-  
-                  {/* Edit Image Button */}
-                  <label className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
-                    <Upload size={18} />
-                    <span>Edit Image</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => setSelectedImage(e.target.files[0])}
-                    />
-                  </label>
+                  <img
+                    src={myDetails.profileImg}
+                    alt="Profile"
+                    className="w-28 h-28 rounded-full object-cover border-4 border-blue-600"
+                  />
+                ) : (
+                  <div className="w-28 h-28 flex items-center justify-center bg-gray-200 rounded-full border-4 border-blue-600">
+                    <User size={40} className="text-gray-500" />
+                  </div>
+                )}
+
+                {/* Edit Image Button */}
+                <label className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
+                  <Upload size={18} />
+                  <span>Edit Image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => setSelectedImage(e.target.files[0])}
+                  />
+                </label>
+                {
+                  selectedImage &&
+                  <button onClick={handleUploadImage}>upload here</button>
+                }
               </div>
 
               <div className="space-y-4 mt-4">
@@ -167,8 +226,7 @@ function Account() {
         </div>
       </div>
     </div>
-
   );
 }
-  export default Account;
+ export default Account;
 
