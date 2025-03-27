@@ -1,7 +1,7 @@
 import React from "react";
 import moment from "moment";
 
-function MessageBubble({ text, timestamp, senderId, loggedInUserId, image }) {
+function MessageBubble({ text, timestamp, senderId, loggedInUserId, image, deleteMsg }) {
   const isSentByUser = senderId === loggedInUserId; // Compare sender ID with logged-in user
 
   if (!text && !image) return null;
@@ -35,6 +35,9 @@ function MessageBubble({ text, timestamp, senderId, loggedInUserId, image }) {
           {timestamp ? moment(timestamp).format("hh:mm A") : "Time Unknown"}
         </p>
       </div>
+      <button onClick={deleteMsg}>
+        delete
+      </button>
     </div>
   );
 }

@@ -42,7 +42,7 @@ export const allMessagedUsersAPI = async (loggedUserId, reqHeader) => {
   );
 };
 
-//GET LOGGED USER DATA
+//GET SINGLE USER DATA
 export const getMyAccountDetailsAPI = async (myUserId) => {
   return await commonAPI(
     "GET",
@@ -54,4 +54,14 @@ export const getMyAccountDetailsAPI = async (myUserId) => {
 //UPDATE USERNAME API
 export const updateUsernameAPI = async (reqBody) => {
   return await commonAPI("PUT",`${SERVER_BASE_URL}/user/update-Username`,reqBody)
+}
+
+//CLEAR ALL CHATS API
+export const clearAllChatsAPI = async (data, reqHeader) =>{
+  return await commonAPI("DELETE", `${SERVER_BASE_URL}/user/clear-all-chats`,data,reqHeader)
+}
+
+//DELETE SINGLE MESSAGE API
+export const deleteSingleMessageAPI = async (id, reqHeader)=>{
+  return await commonAPI("DELETE", `${SERVER_BASE_URL}/user/remove-message/${id}`,{},reqHeader)
 }
