@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { User, Mail, Camera, LogOut, Home, Check, X } from "lucide-react";
+import { User, Mail, Camera, LogOut, Home, Check, X, Upload } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getMyAccountDetailsAPI, updateUsernameAPI } from "../services/allAPI";
 
@@ -8,6 +8,7 @@ function Account() {
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [newUsername, setNewUsername] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const fetchMyAccountDetails = async () => {
     setLoading(true);
@@ -42,6 +43,8 @@ function Account() {
       if (result.status === 200) {
         setMyDetails({ ...myDetails, username: newUsername });
         setEditing(false);
+        console.log("Username changed !");
+        
       } else {
         console.log("Update failed");
       }
@@ -71,11 +74,30 @@ function Account() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center space-x-4">
-                <img
-                  src={myDetails.profileImg?myDetails.profileImg:""}
-                  alt="Profile"
-                  className="w-20 h-20 rounded-full object-cover"
-                />
+                {/* Profile Image or User Icon */}
+                {myDetails?.profileImg ? (
+                    <img
+                      src={myDetails.profileImg}
+                      alt="Profile"
+                      className="w-28 h-28 rounded-full object-cover border-4 border-blue-600"
+                    />
+                  ) : (
+                    <div className="w-28 h-28 flex items-center justify-center bg-gray-200 rounded-full border-4 border-blue-600">
+                      <User size={40} className="text-gray-500" />
+                    </div>
+                  )}
+  
+                  {/* Edit Image Button */}
+                  <label className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
+                    <Upload size={18} />
+                    <span>Edit Image</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => setSelectedImage(e.target.files[0])}
+                    />
+                  </label>
               </div>
 
               <div className="space-y-4 mt-4">
@@ -145,7 +167,9 @@ function Account() {
         </div>
       </div>
     </div>
+
   );
 }
+  export default Account;
 
-export default Account;
+
