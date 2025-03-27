@@ -16,6 +16,7 @@ function ChatList() {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const { loggedUserData } = useContext(loggedUserDataContext);
+    const { messages } = useChatContext(); 
 
   const handleSearch = async (e) => {
     const query = e.target.value;
@@ -62,7 +63,7 @@ function ChatList() {
 
   useEffect(() => {
     fetchMessagedUsers();
-  }, []);
+  }, [messages]);
 
   return (
     <div className="relative flex flex-col h-full">
@@ -86,6 +87,7 @@ function ChatList() {
             searchResults.map((user) => (
               <ChatPreview
                 key={user._id}
+                userId={user._id}
                 name={user.username}
                 avatar={user.avatar}
                 lastMessage="Tap to chat"
@@ -110,6 +112,7 @@ function ChatList() {
           users.map((user) => (
             <ChatPreview
               key={user._id}
+              userId={user._id}
               name={user.username}
               avatar={user.avatar}
               lastMessage="Tap to chat"

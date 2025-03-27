@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import moment from "moment";
 import { Edit2, Trash2 } from "lucide-react";
 
-function MessageBubble({ text, timestamp, senderId, loggedInUserId, image, messageId }) {
+
+function MessageBubble({ text, timestamp, senderId, loggedInUserId, image,deleteMsg , messageId }) {
   const isSentByUser = senderId === loggedInUserId;
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
@@ -15,10 +16,32 @@ function MessageBubble({ text, timestamp, senderId, loggedInUserId, image, messa
   const handleContextMenu = (e) => {
     if (isSentByUser) {
       e.preventDefault();
-      setContextMenuPosition({ x: e.pageX, y: e.pageY });
+  
+      const menuWidth = 200; // Approximate width of the context menu
+      const menuHeight = 100; // Approximate height of the context menu
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+  
+      let x = e.clientX;
+      let y = e.clientY;
+  
+      // Adjust if menu goes beyond screen width
+      if (x + menuWidth > screenWidth) {
+        x = screenWidth - menuWidth - 10; // 10px padding
+      }
+  
+      // Adjust if menu goes beyond screen height
+      if (y + menuHeight > screenHeight) {
+        y = screenHeight - menuHeight - 10; // 10px padding
+      }
+  
+      setContextMenuPosition({ x, y });
       setShowContextMenu(true);
     }
   };
+
+  console.log(contextMenuPosition);
+  
 
   const handleEdit = () => {
     setShowContextMenu(false);
@@ -36,7 +59,8 @@ function MessageBubble({ text, timestamp, senderId, loggedInUserId, image, messa
   };
 
   const handleConfirmDelete = () => {
-    // Add your delete message logic here
+    const deleteSingleMsg = deleteMsg
+    deleteSingleMsg()
     setShowDeleteModal(false);
   };
 
@@ -70,6 +94,7 @@ function MessageBubble({ text, timestamp, senderId, loggedInUserId, image, messa
           </p>
         </div>
       </div>
+
 
       {/* Context Menu */}
       {showContextMenu && (

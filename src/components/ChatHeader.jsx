@@ -1,14 +1,40 @@
 import React, { useState } from "react";
 import { useChatContext } from "../contexts/ChatProvider";
-import { MoreVertical, UserCircle, Trash2, XIcon } from "lucide-react";
 import default_avatar from "../assets/default-avatar.svg";
+import { getMyAccountDetailsAPI } from "../services/allAPI";
+import { MoreVertical, UserCircle, Trash2, XIcon } from "lucide-react";
+// import default_avatar from "../assets/default-avatar.svg";
 
 function ChatHeader({ name, avatar, userId }) {
   const { onlineUsers } = useChatContext();
   const isOnline = onlineUsers.includes(userId);
+  const [viewProfileData, setViewProfileData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  //VIEW USER INFO
+  const handleViewUserInfo = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setLoading(true);
+      try {
+        const result = await getMyAccountDetailsAPI(userId);
+        if (result.status == 200) {
+          setViewProfileData(result.data);
+        } else if (result.status == 400) {
+          console.log(result.data.error);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      console.log("No token found for view profile info");
+    }
+  };
+
   const [showDropdown, setShowDropdown] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
 
   const handleClearChat = () => {
     setShowDeleteModal(true);
@@ -20,10 +46,17 @@ function ChatHeader({ name, avatar, userId }) {
     setShowDeleteModal(false);
   };
 
+  console.log(viewProfileData);
+
   return (
     <>
       <div className="p-3 sm:p-4 bg-white border-b border-gray-200 flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center">
+        <div
+          onClick={() => {
+            setShowDropdown(true);
+          }}
+          className="flex items-center"
+        >
           <img
             src={avatar ? avatar : default_avatar}
             alt={name}
@@ -51,8 +84,8 @@ function ChatHeader({ name, avatar, userId }) {
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200">
               <button
                 onClick={() => {
-                  setShowProfile(true);
                   setShowDropdown(false);
+                  handleViewUserInfo();
                 }}
                 className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
@@ -75,9 +108,12 @@ function ChatHeader({ name, avatar, userId }) {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-transparent bg-opacity-70 backdrop-blur-md flex items-center justify-center z-25">
           <div className="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-xl">
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">Clear Chat History</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">
+              Clear Chat History
+            </h3>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to clear all messages? This action cannot be undone.
+              Are you sure you want to clear all messages? This action cannot be
+              undone.
             </p>
             <div className="flex justify-end space-x-3">
               <button
@@ -98,12 +134,12 @@ function ChatHeader({ name, avatar, userId }) {
       )}
 
       {/* Profile Modal */}
-      {showProfile && (
+      {viewProfileData && (
         <div className="fixed inset-0 bg-transparent bg-opacity-70 backdrop-blur-md flex items-center justify-center z-25">
           <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
             <button
-              onClick={() => setShowProfile(false)}
-              className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700"
+              onClick={() => setViewProfileData(null)}
+              className="absolute top-4 left-4 md:left-auto md:right-4 p-2 text-gray-500 hover:text-gray-700 z-50"
             >
               <XIcon className="w-6 h-6" />
             </button>
@@ -113,12 +149,18 @@ function ChatHeader({ name, avatar, userId }) {
                 alt={name}
                 className="w-24 h-24 rounded-full bg-gray-200 object-cover mb-4"
               />
-              <h3 className="text-xl font-semibold mb-2 text-gray-800">{name}</h3>
-              <p className="text-green-500 mb-4">{isOnline ? "Online" : "Offline"}</p>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">
+                {viewProfileData?.username}
+              </h3>
+              <p className="text-green-500 mb-4">
+                {isOnline ? "Online" : "Offline"}
+              </p>
               <div className="w-full space-y-2">
-                <div className="flex justify-between p-2 rounded">
-                  <span className="text-gray-600">User ID</span>
-                  <span className="text-gray-800">{userId}</span>
+                <div className="flex gap-2 justify-between p-2 rounded">
+                  <span className="text-gray-600">Email ID :</span>
+                  <span className="text-gray-800">
+                    {viewProfileData?.email}
+                  </span>
                 </div>
               </div>
             </div>

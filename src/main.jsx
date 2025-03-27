@@ -4,12 +4,15 @@ import "./index.css";
 import App from "./App.jsx";
 import DataContextShare from "./contexts/DataContextShare.jsx";
 import { ChatProvider } from "./contexts/ChatProvider.jsx";
+import ResponseContextShare from "./contexts/ResponseContextShare.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <DataContextShare>
       <ChatProvider>
-        <App />
+        <ResponseContextShare>
+          <App />
+        </ResponseContextShare>
       </ChatProvider>
     </DataContextShare>
   </StrictMode>

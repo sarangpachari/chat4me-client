@@ -9,14 +9,46 @@ import {
 } from "../contexts/DataContextShare";
 
 import { FaRegMessage } from "react-icons/fa6";
+import { deleteSingleMessageAPI } from "../services/allAPI";
+import { deleteSingleMsgResponseContext } from "../contexts/ResponseContextShare";
 
 function ChatArea() {
   const { loggedUserData } = useContext(loggedUserDataContext);
-  const { messages, selectedChat } = useChatContext(); // Use selectedChat from ChatContext
+  const { messages, setMessages, selectedChat } = useChatContext(); // Use selectedChat from ChatContext
   const { allChatPreviewData, setAllChatPreviewData } = useContext(
     chatPreviewDataContext
   );
+  const { singleDeleteMsgResponse, setSingleDeleteMsgResponse } = useContext(
+    deleteSingleMsgResponseContext
+  );
 
+  //DELETE SINGLE MESSAGE
+  const handleRemoveSingleMessage = async (messageId) => {
+    const id = messageId;
+    const token = localStorage.getItem("token");
+
+    if (id && token) {
+      const reqHeader = {
+        Authorization: token,
+      };
+      try {
+        const result = await deleteSingleMessageAPI(id, reqHeader);
+        if (result.status == 200) {
+          setFilteredMessages((prevMessages) =>
+            prevMessages.filter((msg) => msg._id !== messageId)
+          );
+          setMessages((prevMessages) =>
+            prevMessages.filter((msg) => msg._id !== messageId)
+          );
+          setSingleDeleteMsgResponse(result.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      console.log("Error: select a message or token missing");
+    }
+  };
 
   const messagesEndRef = useRef(null);
 
@@ -58,8 +90,9 @@ function ChatArea() {
                 key={message._id}
                 text={message.chat}
                 timestamp={message.createdAt}
-                senderId={message.senderId} 
+                senderId={message.senderId}
                 loggedInUserId={loggedUserData._id}
+                deleteMsg={() => handleRemoveSingleMessage(message._id)}
               />
             ))}
             <div ref={messagesEndRef} />
