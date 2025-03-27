@@ -89,7 +89,7 @@ function ChatList() {
                 key={user._id}
                 userId={user._id}
                 name={user.username}
-                avatar={user.profileImg}
+                avatar={user.avatar}
                 lastMessage="Tap to chat"
                 timestamp=""
                 onClick={() => {
@@ -114,7 +114,7 @@ function ChatList() {
               key={user._id}
               userId={user._id}
               name={user.username}
-              avatar={user.profileImg}
+              avatar={user.avatar}
               lastMessage="Tap to chat"
               timestamp=""
               onClick={() => {
