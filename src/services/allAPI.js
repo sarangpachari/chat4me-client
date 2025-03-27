@@ -65,3 +65,8 @@ export const clearAllChatsAPI = async (reqBody, reqHeader) =>{
 export const deleteSingleMessageAPI = async (id, reqHeader)=>{
   return await commonAPI("DELETE", `${SERVER_BASE_URL}/user/remove-message/${id}`,{},reqHeader)
 }
+
+//UPDATE USER PROFILE API
+export const updateUserProfilePictureAPI = async (id,formData,reqHeader) =>{
+  return await commonAPI("PUT", `${SERVER_BASE_URL}/user/update-Profile/${id}`,formData,reqHeader)
+}
