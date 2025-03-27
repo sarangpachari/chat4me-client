@@ -40,7 +40,6 @@ function MessageBubble({ text, timestamp, senderId, loggedInUserId, image,delete
     }
   };
 
-  console.log(contextMenuPosition);
   
 
   const handleEdit = () => {

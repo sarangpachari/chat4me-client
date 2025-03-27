@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useChatContext } from "../contexts/ChatProvider";
 import default_avatar from "../assets/default-avatar.svg";
-import { getMyAccountDetailsAPI } from "../services/allAPI";
+import { clearAllChatsAPI, getMyAccountDetailsAPI } from "../services/allAPI";
 import { MoreVertical, UserCircle, Trash2, XIcon } from "lucide-react";
 // import default_avatar from "../assets/default-avatar.svg";
 
@@ -10,6 +10,7 @@ function ChatHeader({ name, avatar, userId }) {
   const isOnline = onlineUsers.includes(userId);
   const [viewProfileData, setViewProfileData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { setSelectedChat, setMessages } = useChatContext();
 
   //VIEW USER INFO
   const handleViewUserInfo = async () => {
@@ -41,12 +42,55 @@ function ChatHeader({ name, avatar, userId }) {
     setShowDropdown(false);
   };
 
-  const handleConfirmClear = () => {
-    // Add your clear chat logic here
+  const handleConfirmClear = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setLoading(true);
+      const reqHeader = {
+        Authorization: token,
+      };
+
+      const loggedUser = JSON.parse(localStorage.getItem("user"));
+
+      const reqBody = {
+        senderId: loggedUser?._id,
+        receiverId: userId,
+      };
+
+      if (reqBody && reqHeader) {
+        try {
+          const result = await clearAllChatsAPI(reqBody, reqHeader);
+          if (result.status == 200) {
+            setSelectedChat(null);
+            setMessages((prevMessages) =>
+              prevMessages.filter(
+                (msg) =>
+                  !(
+                    (msg.senderId === loggedUser._id &&
+                      msg.receiverId === userId) ||
+                    (msg.senderId === userId &&
+                      msg.receiverId === loggedUser._id)
+                  )
+              )
+            );
+          } else if (result.status == 400) {
+            console.log(
+              "Sender ID and Receiver ID are required & Token missing"
+            );
+          }
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setShowDeleteModal(false);
+          setShowDropdown(false);
+          setLoading(false);
+        }
+      } else {
+        console.log("Sender ID and Receiver ID are required & Token missing");
+      }
+    }
     setShowDeleteModal(false);
   };
-
-  console.log(viewProfileData);
 
   return (
     <>

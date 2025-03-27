@@ -57,8 +57,8 @@ export const updateUsernameAPI = async (reqBody) => {
 }
 
 //CLEAR ALL CHATS API
-export const clearAllChatsAPI = async (data, reqHeader) =>{
-  return await commonAPI("DELETE", `${SERVER_BASE_URL}/user/clear-all-chats`,data,reqHeader)
+export const clearAllChatsAPI = async (reqBody, reqHeader) =>{
+  return await commonAPI("DELETE", `${SERVER_BASE_URL}/user/clear-all-chats`,reqBody,reqHeader)
 }
 
 //DELETE SINGLE MESSAGE API
