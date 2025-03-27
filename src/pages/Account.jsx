@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { User, Mail, LogOut, Home, Check, X, Settings } from "lucide-react";
+import { User, Mail, LogOut, Home, Check, X, Settings, Upload } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getMyAccountDetailsAPI, updateUsernameAPI } from "../services/allAPI";
 
@@ -7,6 +7,7 @@ function Account() {
   const [myDetails, setMyDetails] = useState({});
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const fetchMyAccountDetails = async () => {
     setLoading(true);
@@ -54,12 +55,31 @@ function Account() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <div className="flex items-center justify-center space-x-4">
-                <img
-                  src="https://comicbook.com/wp-content/uploads/sites/4/2024/11/One-Piece-Luffy.webp"
-                  alt="Profile"
-                  className="w-28 h-28 rounded-full object-cover border-4 border-blue-600"
-                />
+              <div className="flex flex-col items-center space-y-4">
+                {/* Profile Image or User Icon */}
+                {myDetails?.profileImage ? (
+                  <img
+                    src={myDetails.profileImage}
+                    alt="Profile"
+                    className="w-28 h-28 rounded-full object-cover border-4 border-blue-600"
+                  />
+                ) : (
+                  <div className="w-28 h-28 flex items-center justify-center bg-gray-200 rounded-full border-4 border-blue-600">
+                    <User size={40} className="text-gray-500" />
+                  </div>
+                )}
+
+                {/* Edit Image Button */}
+                <label className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
+                  <Upload size={18} />
+                  <span>Edit Image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => setSelectedImage(e.target.files[0])}
+                  />
+                </label>
               </div>
 
               <div className="space-y-4 mt-4">
@@ -108,7 +128,7 @@ function Account() {
 
         {/* Modal for Updating Account Details */}
         {showModal && (
-          <div className="fixed inset-0 bg-transparent shadow-md bg-opacity-40 flex items-center justify-center z-50 backdrop-blur-md">
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 backdrop-blur-md">
             <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Update Account Details
