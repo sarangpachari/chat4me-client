@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import moment from "moment";
 import { Edit2, Trash2 } from "lucide-react";
 
-
-function MessageBubble({ text, timestamp, senderId, loggedInUserId, image,deleteMsg , messageId }) {
+function MessageBubble({ text, timestamp, senderId, loggedInUserId, deleteMsg, messageId }) {
   const isSentByUser = senderId === loggedInUserId;
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
@@ -11,36 +10,30 @@ function MessageBubble({ text, timestamp, senderId, loggedInUserId, image,delete
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editedText, setEditedText] = useState(text);
 
-  if (!text && !image) return null;
+  if (!text) return null;
+
+  // Check if the text is a Cloudinary image URL
+  const isImageMessage = text.startsWith("https://res.cloudinary.com");
 
   const handleContextMenu = (e) => {
     if (isSentByUser) {
       e.preventDefault();
-  
-      const menuWidth = 200; // Approximate width of the context menu
-      const menuHeight = 100; // Approximate height of the context menu
+
+      const menuWidth = 200;
+      const menuHeight = 100;
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
-  
+
       let x = e.clientX;
       let y = e.clientY;
-  
-      // Adjust if menu goes beyond screen width
-      if (x + menuWidth > screenWidth) {
-        x = screenWidth - menuWidth - 10; // 10px padding
-      }
-  
-      // Adjust if menu goes beyond screen height
-      if (y + menuHeight > screenHeight) {
-        y = screenHeight - menuHeight - 10; // 10px padding
-      }
-  
+
+      if (x + menuWidth > screenWidth) x = screenWidth - menuWidth - 10;
+      if (y + menuHeight > screenHeight) y = screenHeight - menuHeight - 10;
+
       setContextMenuPosition({ x, y });
       setShowContextMenu(true);
     }
   };
-
-  
 
   const handleEdit = () => {
     setShowContextMenu(false);
@@ -58,14 +51,13 @@ function MessageBubble({ text, timestamp, senderId, loggedInUserId, image,delete
   };
 
   const handleConfirmDelete = () => {
-    const deleteSingleMsg = deleteMsg
-    deleteSingleMsg()
+    deleteMsg();
     setShowDeleteModal(false);
   };
 
   return (
     <>
-      <div 
+      <div
         className={`flex ${isSentByUser ? "justify-end" : "justify-start"}`}
         onContextMenu={handleContextMenu}
       >
@@ -76,14 +68,15 @@ function MessageBubble({ text, timestamp, senderId, loggedInUserId, image,delete
               : "bg-gray-200 text-black rounded-bl-none"
           }`}
         >
-          {image && (
+          {isImageMessage ? (
             <img
-              src={image}
+              src={text}
               alt="Sent content"
               className="max-w-full h-auto rounded-lg mb-2"
             />
+          ) : (
+            <p className="text-sm sm:text-base">{text}</p>
           )}
-          {text && <p className="text-sm sm:text-base">{text}</p>}
           <p
             className={`text-[10px] sm:text-xs mt-1 ${
               isSentByUser ? "text-blue-200" : "text-gray-600"
@@ -93,7 +86,6 @@ function MessageBubble({ text, timestamp, senderId, loggedInUserId, image,delete
           </p>
         </div>
       </div>
-
 
       {/* Context Menu */}
       {showContextMenu && (
