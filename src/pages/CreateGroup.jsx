@@ -1,57 +1,102 @@
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
-import { Search, Users, ArrowLeft, Plus, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Search, Users, ArrowLeft, Plus, X } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { searchUserAPI, createGroupAPI } from "../services/allAPI";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-// Custom hook to debounce values
-function useDebounce(value, delay) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-  
-  return debouncedValue;
-}
 
 function CreateGroup() {
-  const [groupName, setGroupName] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [groupName, setGroupName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [creating, setCreating] = useState(false);
+  const naviagete = useNavigate()
+  
 
-  // Mock data for demonstration
-  const mockUsers = [
-    { id: '1', name: 'John Doe', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100' },
-    { id: '2', name: 'Jane Smith', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100' },
-    { id: '3', name: 'Mike Johnson', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100' },
-  ];
+  // For holding users mapped by userId to improve lookup speed
+  const userMap = new Map(searchResults.map((user) => [user._id, user]));
 
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  useEffect(() => {
+    if (searchQuery) {
+      handleSearch();
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery]);
 
-  const toggleUserSelection = useCallback((userId) => {
-    setSelectedUsers(prev =>
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return setSearchResults([]);
+  
+    setLoading(true);
+    try {
+      const { data } = await searchUserAPI(searchQuery);
+      const loggedInUserId = JSON.parse(localStorage.getItem("user"))._id;
+  
+      // Exclude the logged-in user from the search results
+      const filteredResults = data.users.filter(user => user._id !== loggedInUserId);
+  
+      setSearchResults(filteredResults);
+    } catch (error) {
+      console.error("Search error:", error);
+      setSearchResults([]);
+    }
+    setLoading(false);
+  };
+  
+
+  const toggleUserSelection = (userId) => {
+    setSelectedUsers((prev) =>
       prev.includes(userId)
-        ? prev.filter(id => id !== userId)
+        ? prev.filter((id) => id !== userId)
         : [...prev, userId]
     );
-  }, []);
+  };
 
-  const filteredUsers = useMemo(() => {
-    return mockUsers.filter(user =>
-      user.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
-    );
-  }, [debouncedSearchQuery, mockUsers]);
+  const handleCreateGroup = async () => {
+    if (!groupName.trim() || selectedUsers.length === 0) {
+      return alert("Group name and at least one member are required!");
+    }
 
-  const handleCreateGroup = () => {
-    // TODO: Integrate group creation API call here
-    console.log("Creating group with name:", groupName);
-    console.log("Selected Users:", selectedUsers);
+    setCreating(true);
+    const loggedInUserId = JSON.parse(localStorage.getItem("user"));
+    const token = localStorage.getItem("token");
+
+    const reqBody = {
+      name: groupName,
+      userId: loggedInUserId._id,
+      groupMember: selectedUsers,
+    };
+
+    const reqHeader = {
+      Authorization: token,
+    };
+
+    try {
+      const response = await createGroupAPI(reqBody, reqHeader);
+
+      if (response.status === 200) {
+        toast.success("Group created successfully!");
+        setGroupName("");
+        setSelectedUsers([]);
+        naviagete('/home')
+      } else if (response.status === 400) {
+        toast.warning("Add at least one member");
+      } else {
+        throw new Error("Failed to create group.");
+      }
+    } catch (error) {
+      console.error("Group creation error:", error);
+      toast.error("Error creating group. Please try again.");
+    }
+    setCreating(false);
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-2xl mx-auto bg-white shadow-md">
-        {/* Header */}
         <div className="p-4 flex items-center">
           <Link to="/home" className="p-2 hover:bg-gray-100 rounded-full">
             <ArrowLeft className="w-6 h-6 text-gray-600" />
@@ -59,7 +104,6 @@ function CreateGroup() {
           <h1 className="ml-4 text-xl font-semibold">Create New Group</h1>
         </div>
 
-        {/* Group Name Input */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
@@ -75,7 +119,6 @@ function CreateGroup() {
           </div>
         </div>
 
-        {/* Search and User List */}
         <div className="p-4">
           <div className="relative mb-4">
             <input
@@ -88,22 +131,27 @@ function CreateGroup() {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
           </div>
 
-          {/* Selected Users */}
+          {loading && (
+            <div className="text-center text-gray-500">Searching...</div>
+          )}
+
           {selectedUsers.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
-              {selectedUsers.map(userId => {
-                const user = mockUsers.find(u => u.id === userId);
+              {selectedUsers.map((userId) => {
+                const user = userMap.get(userId);
                 return (
                   <div
                     key={userId}
                     className="flex items-center gap-2 bg-blue-100 px-3 py-1 rounded-full"
                   >
                     <img
-                      src={user?.avatar}
-                      alt={user?.name}
+                      src={user?.avatar || "default-avatar.png"}
+                      alt={user?.username}
                       className="w-6 h-6 rounded-full"
                     />
-                    <span className="text-sm text-blue-800">{user?.name}</span>
+                    <span className="text-sm text-blue-800">
+                      {user?.username}
+                    </span>
                     <button
                       onClick={() => toggleUserSelection(userId)}
                       className="text-blue-800 hover:text-blue-900"
@@ -116,23 +164,24 @@ function CreateGroup() {
             </div>
           )}
 
-          {/* User List */}
           <div className="space-y-2">
-            {filteredUsers.map(user => (
+            {searchResults.map((user) => (
               <div
-                key={user.id}
-                onClick={() => toggleUserSelection(user.id)}
+                key={user._id}
+                onClick={() => toggleUserSelection(user._id)}
                 className={`flex items-center p-3 rounded-lg cursor-pointer ${
-                  selectedUsers.includes(user.id) ? 'bg-blue-50' : 'hover:bg-gray-50'
+                  selectedUsers.includes(user._id)
+                    ? "bg-blue-50"
+                    : "hover:bg-gray-50"
                 }`}
               >
                 <img
-                  src={user.avatar}
-                  alt={user.name}
+                  src={user.profileImg || "default-avatar.png"}
+                  alt={user.username}
                   className="w-10 h-10 rounded-full"
                 />
-                <span className="ml-3 flex-1">{user.name}</span>
-                {selectedUsers.includes(user.id) ? (
+                <span className="ml-3 flex-1">{user.username}</span>
+                {selectedUsers.includes(user._id) ? (
                   <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                     <X className="w-4 h-4 text-white" />
                   </div>
@@ -146,18 +195,21 @@ function CreateGroup() {
           </div>
         </div>
 
-        {/* Create Button */}
         <div className="p-4 border-t border-gray-200">
           <button
             onClick={handleCreateGroup}
-            disabled={!groupName.trim() || selectedUsers.length === 0}
+            disabled={
+              creating || !groupName.trim() || selectedUsers.length === 0
+            }
             className={`w-full py-2 px-4 rounded-lg ${
-              groupName.trim() && selectedUsers.length > 0
-                ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+              creating
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : groupName.trim() && selectedUsers.length > 0
+                ? "bg-blue-500 hover:bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-500 cursor-not-allowed"
             }`}
           >
-            Create Group
+            {creating ? "Creating..." : "Create Group"}
           </button>
         </div>
       </div>
