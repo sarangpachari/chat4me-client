@@ -47,26 +47,55 @@ export const getMyAccountDetailsAPI = async (myUserId) => {
   return await commonAPI(
     "GET",
     `${SERVER_BASE_URL}/user/user-Info/${myUserId}`,
-    {},
+    {}
   );
 };
 
 //UPDATE USERNAME API
 export const updateUsernameAPI = async (reqBody) => {
-  return await commonAPI("PUT",`${SERVER_BASE_URL}/user/update-Username`,reqBody)
-}
+  return await commonAPI(
+    "PUT",
+    `${SERVER_BASE_URL}/user/update-Username`,
+    reqBody
+  );
+};
 
 //CLEAR ALL CHATS API
-export const clearAllChatsAPI = async (reqBody, reqHeader) =>{
-  return await commonAPI("DELETE", `${SERVER_BASE_URL}/user/clear-all-chats`,reqBody,reqHeader)
-}
+export const clearAllChatsAPI = async (reqBody, reqHeader) => {
+  return await commonAPI(
+    "DELETE",
+    `${SERVER_BASE_URL}/user/clear-all-chats`,
+    reqBody,
+    reqHeader
+  );
+};
 
 //DELETE SINGLE MESSAGE API
-export const deleteSingleMessageAPI = async (id, reqHeader)=>{
-  return await commonAPI("DELETE", `${SERVER_BASE_URL}/user/remove-message/${id}`,{},reqHeader)
-}
+export const deleteSingleMessageAPI = async (id, reqHeader) => {
+  return await commonAPI(
+    "DELETE",
+    `${SERVER_BASE_URL}/user/remove-message/${id}`,
+    {},
+    reqHeader
+  );
+};
 
 //UPDATE USER PROFILE API
-export const updateUserProfilePictureAPI = async (id,formData,reqHeader) =>{
-  return await commonAPI("PUT", `${SERVER_BASE_URL}/user/update-Profile/${id}`,formData,reqHeader)
-}
+export const updateUserProfilePictureAPI = async (id, formData, reqHeader) => {
+  return await commonAPI(
+    "PUT",
+    `${SERVER_BASE_URL}/user/update-Profile/${id}`,
+    formData,
+    reqHeader
+  );
+};
+
+//FETCHING ALL MY GROUPS API
+export const allMyGroupsAPI = async (loggedUserId, reqHeader) => {
+  return await commonAPI(
+    "GET",
+    `${SERVER_BASE_URL}/grp/get-all-groups/${loggedUserId}`,
+    {},
+    reqHeader
+  );
+};
