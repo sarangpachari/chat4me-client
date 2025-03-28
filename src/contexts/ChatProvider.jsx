@@ -30,26 +30,25 @@ export const ChatProvider = ({ children }) => {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       });
 
-      return () => {
+      socket.on("receiveFile", (newFile) => {
         
+        setMessages((prev) => [...prev, newFile]);
+      });
+
+      return () => {
         socket.off("updateUserStatus");
         socket.off("message");
+        socket.off("receiveFile");
         socket.disconnect();
       };
     }
   }, [user]);
-
-  const sendMessage = (receiverId, chat) => {
-    const newMessage = { senderId: user._id, receiverId, chat };
-    socket.emit("message", newMessage);
-  };
 
   return (
     <ChatContext.Provider
       value={{
         messages,
         setMessages,
-        sendMessage,
         selectedChat,
         setSelectedChat,
         chatPreviewData,
