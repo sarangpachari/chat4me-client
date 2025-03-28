@@ -99,3 +99,12 @@ export const allMyGroupsAPI = async (loggedUserId, reqHeader) => {
     reqHeader
   );
 };
+
+//CREATE Grpup
+export const createGroupAPI = async (reqBody,reqHeader) => {
+  return await commonAPI(
+    "POST",
+    `${SERVER_BASE_URL}/grp/create-group`,
+    reqBody,reqHeader
+  );
+};
