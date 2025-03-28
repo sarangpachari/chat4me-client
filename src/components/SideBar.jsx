@@ -91,6 +91,14 @@ function SideBar() {
                     </button>
                   </li>
                 </Link>
+                <Link to="/group">
+                  <li>
+                    <button className="flex items-center gap-2 w-full text-left px-4 py-4 hover:bg-gray-100">
+                      <MdAccountCircle size={20} />
+                      Create Group
+                    </button>
+                  </li>
+                </Link>
                 <li>
                   <button
                     className="flex items-center gap-2 w-full text-left px-4 py-4 hover:bg-gray-100 text-red-600"
