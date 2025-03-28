@@ -14,7 +14,7 @@ import { deleteSingleMsgResponseContext } from "../contexts/ResponseContextShare
 
 function ChatArea() {
   const { loggedUserData } = useContext(loggedUserDataContext);
-  const { messages, setMessages, selectedChat } = useChatContext(); // Use selectedChat from ChatContext
+  const { messages, setMessages, selectedChat, socket } = useChatContext();
   const { allChatPreviewData, setAllChatPreviewData } = useContext(
     chatPreviewDataContext
   );
@@ -22,37 +22,10 @@ function ChatArea() {
     deleteSingleMsgResponseContext
   );
 
-  //DELETE SINGLE MESSAGE
-  const handleRemoveSingleMessage = async (messageId) => {
-    const id = messageId;
-    const token = localStorage.getItem("token");
-
-    if (id && token) {
-      const reqHeader = {
-        Authorization: token,
-      };
-      try {
-        const result = await deleteSingleMessageAPI(id, reqHeader);
-        if (result.status == 200) {
-          setFilteredMessages((prevMessages) =>
-            prevMessages.filter((msg) => msg._id !== messageId)
-          );
-          setMessages((prevMessages) =>
-            prevMessages.filter((msg) => msg._id !== messageId)
-          );
-          setSingleDeleteMsgResponse(result.data);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      console.log("Error: select a message or token missing");
-    }
-  };
-
   const messagesEndRef = useRef(null);
-
   const [filteredMessages, setFilteredMessages] = useState([]);
+
+  
 
   useEffect(() => {
     if (selectedChat) {
@@ -76,14 +49,12 @@ function ChatArea() {
     <div className="flex flex-col h-full">
       {selectedChat ? (
         <>
-          {/* Pass correct user details */}
           <ChatHeader
             name={selectedChat?.username}
             avatar={selectedChat?.avatar}
             userId={selectedChat?._id}
           />
 
-          {/* Messages Section */}
           <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-gray-50">
             {filteredMessages.map((message) => (
               <MessageBubble
@@ -92,13 +63,13 @@ function ChatArea() {
                 timestamp={message.createdAt}
                 senderId={message.senderId}
                 loggedInUserId={loggedUserData._id}
+                image={message.isFile ? message.chat : null} // 🟢 Pass file URL if it's a file
                 deleteMsg={() => handleRemoveSingleMessage(message._id)}
               />
             ))}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Message Input */}
           <MessageInput selectedUser={selectedChat} />
         </>
       ) : (
