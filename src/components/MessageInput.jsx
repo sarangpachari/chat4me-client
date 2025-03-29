@@ -3,7 +3,7 @@ import { Send, File, X, Loader } from "lucide-react";
 import { useChatContext } from "../contexts/ChatProvider";
 import { loggedUserDataContext } from "../contexts/DataContextShare";
 
-function MessageInput({ selectedUser }) {
+function MessageInput({ selectedChat }) {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
   const [filePreview, setFilePreview] = useState(null);
@@ -14,8 +14,6 @@ function MessageInput({ selectedUser }) {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-
-    // Read file as base64
     const reader = new FileReader();
     reader.readAsDataURL(selectedFile);
     reader.onload = () => {
@@ -24,13 +22,12 @@ function MessageInput({ selectedUser }) {
         mimetype: selectedFile.type,
       });
 
-      // Check if it's an image or video and set preview
       if (selectedFile.type.startsWith("image/")) {
-        setFilePreview(reader.result); // Set image preview
+        setFilePreview(reader.result);
       } else if (selectedFile.type.startsWith("video/")) {
-        setFilePreview({ type: "video", src: reader.result }); // Set video preview
+        setFilePreview({ type: "video", src: reader.result });
       } else {
-        setFilePreview({ type: "file", name: selectedFile.name }); // For other file types
+        setFilePreview({ type: "file", name: selectedFile.name });
       }
     };
   };
@@ -40,24 +37,36 @@ function MessageInput({ selectedUser }) {
     setUploading(true);
 
     if (file) {
-      // Send file via Socket.IO
-
-      socket.emit("sendFile", {
-        senderId: loggedUserData._id,
-        receiverId: selectedUser._id,
-        file,
-      });
+      if (selectedChat.name) {
+        socket.emit("sendGroupFile", {
+          senderId: loggedUserData._id,
+          groupId: selectedChat._id,
+          file,
+        });
+      } else {
+        socket.emit("sendFile", {
+          senderId: loggedUserData._id,
+          receiverId: selectedChat._id,
+          file,
+        });
+      }
     } else {
-      // Send text message via Socket.IO
-      socket.emit("message", {
-        senderId: loggedUserData._id,
-        receiverId: selectedUser._id,
-        chat: message,
-      });
+      if (selectedChat.name) {
+        socket.emit("groupMessage", {
+          senderId: loggedUserData._id,
+          groupId: selectedChat._id,
+          content: message,
+        });
+      } else {
+        socket.emit("message", {
+          senderId: loggedUserData._id,
+          receiverId: selectedChat._id,
+          chat: message,
+        });
+      }
       setUploading(false);
     }
 
-    // Clear input fields
     setMessage("");
     setFile(null);
     setFilePreview(null);
@@ -65,12 +74,10 @@ function MessageInput({ selectedUser }) {
 
   useEffect(() => {
     const handleFileUploaded = () => {
-      console.log("File uploaded event received"); // Debugging
       setUploading(false);
     };
 
     socket.on("fileUploaded", handleFileUploaded);
-
     return () => {
       socket.off("fileUploaded", handleFileUploaded);
     };
@@ -84,7 +91,6 @@ function MessageInput({ selectedUser }) {
           <input type="file" hidden onChange={handleFileChange} />
         </label>
 
-        {/* Show File Preview */}
         {filePreview && (
           <div className="relative flex items-center space-x-2 border p-2 rounded-lg bg-gray-100">
             {filePreview.type === "video" ? (
@@ -119,7 +125,7 @@ function MessageInput({ selectedUser }) {
           onChange={(e) => setMessage(e.target.value)}
           placeholder={uploading ? "Uploading file..." : "Type your message..."}
           className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-50 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
-          disabled={uploading} 
+          disabled={uploading}
         />
 
         <button
@@ -129,7 +135,7 @@ function MessageInput({ selectedUser }) {
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-500 hover:bg-blue-600"
           } text-white rounded-full`}
-          disabled={uploading} 
+          disabled={uploading}
         >
           {uploading ? (
             <Loader className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />

@@ -12,6 +12,8 @@ export const ChatProvider = ({ children }) => {
   const [selectedChat, setSelectedChat] = useState(null); // Currently active chat
   const [chatPreviewData, setChatPreviewData] = useState([]); // Chat list
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [groupMessages, setGroupMessages] = useState([]);
+  const [joinedGroups, setJoinedGroups] = useState([]);
 
   useEffect(() => {
     if (user) {
@@ -31,14 +33,25 @@ export const ChatProvider = ({ children }) => {
       });
 
       socket.on("receiveFile", (newFile) => {
-        
         setMessages((prev) => [...prev, newFile]);
+      });
+
+      socket.on("joinedGroups", (groups) => setJoinedGroups(groups));
+      
+      socket.on("groupMessage", (newMessage) => {
+        setGroupMessages((prev) => [...prev, newMessage]);
+      });
+      socket.on("receiveGroupFile", ({ groupId, fileMessage }) => {
+        setGroupMessages((prev) => [...prev, { groupId, ...fileMessage }]);
       });
 
       return () => {
         socket.off("updateUserStatus");
         socket.off("message");
         socket.off("receiveFile");
+        socket.off("joinedGroups");
+        socket.off("groupMessage");
+        socket.off("receiveGroupFile");
         socket.disconnect();
       };
     }
@@ -55,6 +68,10 @@ export const ChatProvider = ({ children }) => {
         setChatPreviewData,
         socket,
         onlineUsers,
+        groupMessages,
+        setGroupMessages,
+        joinedGroups,
+        setJoinedGroups,
       }}
     >
       {children}

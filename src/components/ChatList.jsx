@@ -18,29 +18,7 @@ function ChatList() {
   const { loggedUserData } = useContext(loggedUserDataContext);
   const [myGroups, setMyGroups] = useState([]);
 
-  // Mock group data for demonstration
-  const mockGroups = [
-    {
-      _id: "group1",
-      name: "Project Team",
-      avatar: null,
-      isGroup: true,
-      members: ["user1", "user2", "user3"],
-      lastMessage: "Meeting at 3 PM",
-      timestamp: "2:30 PM",
-      lastMessageSender: "John Doe",
-    },
-    {
-      _id: "group2",
-      name: "Family Group",
-      avatar: null,
-      isGroup: true,
-      members: ["user1", "user4", "user5"],
-      lastMessage: "Weekend plans?",
-      timestamp: "11:20 AM",
-      lastMessageSender: "Jane Smith",
-    },
-  ];
+  
 
   const fetchMessagedUsers = async () => {
     const token = localStorage.getItem("token");
@@ -111,7 +89,6 @@ function ChatList() {
     setLoading(false);
   };
 
-  console.log(myGroups);
   
 
   return (
