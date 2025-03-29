@@ -18,6 +18,7 @@ function ChatList() {
   const { loggedUserData } = useContext(loggedUserDataContext);
   const [myGroups, setMyGroups] = useState([]);
 
+
   const fetchMessagedUsers = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -79,6 +80,8 @@ function ChatList() {
     }
     setLoading(false);
   };
+
+  
 
   return (
     <div className="flex flex-col h-full bg-white  rounded-xl">
