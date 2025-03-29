@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserPlus, Trash2, Edit2, Save, Plus, ArrowBigLeft } from 'lucide-react';
 import { Link, useParams } from "react-router-dom";
 import { addMembersAPI, deleteGroupMembersAPI, getGroupAPI, searchUserAPI } from "../services/allAPI";
+import moment from 'moment';
 
 function GroupInfo() {
     const [groupName, setGroupName] = useState('');
@@ -12,7 +13,6 @@ function GroupInfo() {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [loading, setLoading] = useState(false);
-    console.log(details);
 
     // featch data to dispaly on the page
     const fetchGroupInfo = async () => {
@@ -163,7 +163,11 @@ function GroupInfo() {
                                     </button>
                                 </div>
                             )}
-                            <p className="text-white">Created by: {details.createdBy}</p>
+                            <div className='flex flex-col'>
+                            <p className="text-white mb-2">Created by: {details.createdBy}</p>
+                            <p className="text-white">Created at: {moment(details.createdAt).utcOffset(5.5).format('DD MMM YYYY - h:mm A')}</p>
+                            </div>
+                           
                         </div>
                     </div>
 
