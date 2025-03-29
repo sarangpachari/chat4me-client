@@ -3,7 +3,7 @@ import default_avatar from "../assets/default-avatar.svg";
 import { useChatContext } from "../contexts/ChatProvider";
 import { Users } from "lucide-react";
 
-function ChatPreview({ name, avatar, lastMessage, timestamp, userId, isGroup, memberCount, onClick }) {
+function ChatPreview({ name, avatar, lastMessage, userId, isGroup, memberCount, onClick }) {
   const { onlineUsers } = useChatContext();
   const isOnline = !isGroup && onlineUsers.includes(userId);
 
@@ -38,11 +38,7 @@ function ChatPreview({ name, avatar, lastMessage, timestamp, userId, isGroup, me
             <h3 className="text-sm font-semibold text-gray-800 truncate">
               {name}
             </h3>
-            {timestamp && (
-              <span className="text-[10px] sm:text-xs text-gray-400 ml-2">
-                {timestamp}
-              </span>
-            )}
+            
           </div>
           {lastMessage && (
             <p className="text-sm text-gray-500 truncate">{lastMessage}</p>

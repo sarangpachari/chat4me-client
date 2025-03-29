@@ -25,8 +25,6 @@ function ChatArea() {
   const messagesEndRef = useRef(null);
   const [filteredMessages, setFilteredMessages] = useState([]);
 
-  
-
   useEffect(() => {
     if (selectedChat) {
       setFilteredMessages(
@@ -41,36 +39,70 @@ function ChatArea() {
     }
   }, [messages, selectedChat]);
 
-  useEffect(() => {
+  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+  
+  useEffect(() => {
+    scrollToBottom();
   }, [filteredMessages]);
 
   return (
     <div className="flex flex-col h-full">
       {selectedChat ? (
         <>
-          <ChatHeader
-            name={selectedChat?.username}
-            avatar={selectedChat?.avatar}
-            userId={selectedChat?._id}
-          />
-
-          <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-gray-50">
-            {filteredMessages.map((message) => (
-              <MessageBubble
-                key={message._id}
-                text={message.chat}
-                timestamp={message.createdAt}
-                senderId={message.senderId}
-                loggedInUserId={loggedUserData._id}
-                image={message.isFile ? message.chat : null} // 🟢 Pass file URL if it's a file
-                deleteMsg={() => handleRemoveSingleMessage(message._id)}
+          {selectedChat.username && (
+            <>
+              <ChatHeader
+                name={selectedChat?.username}
+                avatar={selectedChat?.avatar}
+                userId={selectedChat?._id}
               />
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
 
-          <MessageInput selectedUser={selectedChat} />
+              <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-gray-50">
+                {filteredMessages.map((message) => (
+                  <MessageBubble
+                    key={message._id}
+                    text={message.chat}
+                    timestamp={message.createdAt}
+                    senderId={message.senderId}
+                    loggedInUserId={loggedUserData._id}
+                    image={message.isFile ? message.chat : null} // 🟢 Pass file URL if it's a file
+                    deleteMsg={() => handleRemoveSingleMessage(message._id)}
+                  />
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+
+              <MessageInput selectedUser={selectedChat} />
+            </>
+          )}
+          {selectedChat?.name && (
+            <>
+              <ChatHeader
+                name={selectedChat?.name}
+                avatar={selectedChat?.groupIcon}
+                groupId={selectedChat?._id}
+              />
+
+              <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-gray-50">
+                {filteredMessages.map((message) => (
+                  <MessageBubble
+                    key={message._id}
+                    text={message.chat}
+                    timestamp={message.createdAt}
+                    senderId={message.senderId}
+                    loggedInUserId={loggedUserData._id}
+                    image={message.isFile ? message.chat : null} // 🟢 Pass file URL if it's a file
+                    deleteMsg={() => handleRemoveSingleMessage(message._id)}
+                  />
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+
+              <MessageInput selectedUser={selectedChat} />
+            </>
+          )}
         </>
       ) : (
         <div className="flex flex-col h-full justify-center md:items-center items-start gap-5 p-4 bg-amber-300">
