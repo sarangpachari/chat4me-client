@@ -99,3 +99,41 @@ export const allMyGroupsAPI = async (loggedUserId, reqHeader) => {
     reqHeader
   );
 };
+
+//CREATE Grpup
+export const createGroupAPI = async (reqBody, reqHeader) => {
+  return await commonAPI(
+    "POST",
+    `${SERVER_BASE_URL}/grp/create-group`,
+    reqBody, reqHeader
+  );
+};
+
+// get group api
+export const getGroupAPI = async (id, reqHeader) => {
+  return await commonAPI(
+    "GET",
+    `${SERVER_BASE_URL}/grp/group-info/${id}`,
+    {},
+    reqHeader
+  );
+};
+
+//DELETE GROUP MEMBERS API
+export const deleteGroupMembersAPI = async (id,reqBody, reqHeader) => {
+  return await commonAPI(
+    "PUT",
+    `${SERVER_BASE_URL}/grp/group-remove-user/${id}`,
+    reqBody,
+    reqHeader
+  );
+};
+//DELETE GROUP MEMBERS API
+export const addMembersAPI = async (id,reqBody, reqHeader) => {
+  return await commonAPI(
+    "PUT",
+    `${SERVER_BASE_URL}/grp/group-add-user/${id}`,
+    reqBody,
+    reqHeader
+  );
+};

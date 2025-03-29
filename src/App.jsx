@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Account from "./pages/Account";
 import CreateGroup from "./pages/CreateGroup";
+import GroupInfo from "./pages/GroupInfo";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/account" element={<Account />} />
           <Route path="/group" element={<CreateGroup />} />
+          <Route path="/group-info/:groupId" element={<GroupInfo />} />
         </Routes>
       </Router>
     </>

@@ -3,6 +3,7 @@ import { useChatContext } from "../contexts/ChatProvider";
 import default_avatar from "../assets/default-avatar.svg";
 import { clearAllChatsAPI, getMyAccountDetailsAPI } from "../services/allAPI";
 import { MoreVertical, UserCircle, Trash2, XIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 // import default_avatar from "../assets/default-avatar.svg";
 
 function ChatHeader({ name, avatar, userId, groupId }) {
@@ -126,7 +127,7 @@ function ChatHeader({ name, avatar, userId, groupId }) {
 
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200">
-              <button
+              {userId && (<button
                 onClick={() => {
                   setShowDropdown(false);
                   handleViewUserInfo();
@@ -135,7 +136,16 @@ function ChatHeader({ name, avatar, userId, groupId }) {
               >
                 <UserCircle className="w-4 h-4 mr-2" />
                 Chat Profile
-              </button>
+              </button>)}
+
+              {groupId && (
+                <Link to={`/group-info/${groupId}`}>
+                  <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <UserCircle className="w-4 h-4 mr-2" />
+                    Group Profile
+                  </button>
+                </Link>
+              )}
               <button
                 onClick={handleClearChat}
                 className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
