@@ -5,7 +5,7 @@ import { clearAllChatsAPI, getMyAccountDetailsAPI } from "../services/allAPI";
 import { MoreVertical, UserCircle, Trash2, XIcon } from "lucide-react";
 // import default_avatar from "../assets/default-avatar.svg";
 
-function ChatHeader({ name, avatar, userId }) {
+function ChatHeader({ name, avatar, userId, groupId }) {
   const { onlineUsers } = useChatContext();
   const isOnline = onlineUsers.includes(userId);
   const [viewProfileData, setViewProfileData] = useState(null);

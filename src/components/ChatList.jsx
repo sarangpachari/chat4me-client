@@ -111,6 +111,9 @@ function ChatList() {
     setLoading(false);
   };
 
+  console.log(myGroups);
+  
+
   return (
     <div className="relative flex flex-col h-full bg-white shadow-md rounded-lg">
       {/* Search Bar */}
@@ -128,21 +131,20 @@ function ChatList() {
       </div>
 
       {/* Groups Section */}
-      {mockGroups.length > 0 && (
+      {myGroups.length > 0 && (
         <div className="mb-4">
           <h3 className="px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50">
             Groups
           </h3>
-          {mockGroups.map((group) => (
+          {myGroups.map((group) => (
             <ChatPreview
               key={group._id}
               userId={group._id}
               name={group.name}
-              avatar={group.avatar}
-              lastMessage={`${group.lastMessageSender}: ${group.lastMessage}`}
-              timestamp={group.timestamp}
+              avatar={group.groupIcon}
+              lastMessage="Tap to Chat"
               isGroup={true}
-              memberCount={group.members.length}
+              memberCount={group.groupMembers.length}
               onClick={() => {
                 setAllChatPreviewData(group);
                 setSelectedChat(group);
