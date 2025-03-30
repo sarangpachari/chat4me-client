@@ -2,11 +2,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import ChatPreview from "./ChatPreview";
 import { useChatContext } from "../contexts/ChatProvider";
-import { allMessagedUsersAPI, allMyGroupsAPI, searchUserAPI } from "../services/allAPI";
 import {
-  chatPreviewDataContext,
-  loggedUserDataContext,
-} from "../contexts/DataContextShare";
+  allMessagedUsersAPI,
+  allMyGroupsAPI,
+  searchUserAPI,
+} from "../services/allAPI";
+import { chatPreviewDataContext } from "../contexts/DataContextShare";
+import { groupCreatedResponseContext } from "../contexts/ResponseContextShare";
 
 function ChatList() {
   const { setAllChatPreviewData } = useContext(chatPreviewDataContext);
@@ -15,9 +17,11 @@ function ChatList() {
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
-  const { loggedUserData } = useContext(loggedUserDataContext);
+  const loggedUserData = JSON.parse(localStorage.getItem("user"));
   const [myGroups, setMyGroups] = useState([]);
 
+   //CONTEXTS
+    const {groupCreatedResponse,setGroupCreatedResponse} = useContext(groupCreatedResponseContext)
 
   const fetchMessagedUsers = async () => {
     const token = localStorage.getItem("token");
@@ -62,7 +66,7 @@ function ChatList() {
   useEffect(() => {
     fetchMessagedUsers();
     fetchMyGroups();
-  }, []);
+  }, [groupCreatedResponse]);
 
   const handleSearch = async (e) => {
     const query = e.target.value;
@@ -73,6 +77,7 @@ function ChatList() {
     setLoading(true);
     try {
       const { data } = await searchUserAPI(query);
+
       setSearchResults(data.users);
     } catch (error) {
       console.error("Search error:", error);
@@ -81,8 +86,7 @@ function ChatList() {
     setLoading(false);
   };
 
-  
-
+  console.log(myGroups);
   return (
     <div className="flex flex-col h-full bg-white  rounded-xl">
       {/* Search Bar */}
@@ -127,21 +131,37 @@ function ChatList() {
 
         {/* My Chats Section */}
         <div>
-          <h3 className="text-xs font-semibold text-gray-500">My Chats</h3>
+          <h3 className="text-xs font-semibold text-gray-500">
+            {searchQuery ? "Search Results" : "My Chats"}
+          </h3>
           <div className="space-y-2">
-            {users.map((user) => (
-              <ChatPreview
-                key={user._id}
-                userId={user._id}
-                name={user.username}
-                avatar={user.avatar}
-                lastMessage="Tap to chat"
-                onClick={() => {
-                  setAllChatPreviewData(user);
-                  setSelectedChat(user);
-                }}
-              />
-            ))}
+            {searchQuery
+              ? searchResults.map((user) => (
+                  <ChatPreview
+                    key={user._id}
+                    userId={user._id}
+                    name={user.username}
+                    avatar={user.avatar}
+                    lastMessage="Tap to chat"
+                    onClick={() => {
+                      setAllChatPreviewData(user);
+                      setSelectedChat(user);
+                    }}
+                  />
+                ))
+              : users.map((user) => (
+                  <ChatPreview
+                    key={user._id}
+                    userId={user._id}
+                    name={user.username}
+                    avatar={user.avatar}
+                    lastMessage="Tap to chat"
+                    onClick={() => {
+                      setAllChatPreviewData(user);
+                      setSelectedChat(user);
+                    }}
+                  />
+                ))}
           </div>
         </div>
       </div>

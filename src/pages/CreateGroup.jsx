@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Search, Users, ArrowLeft, Plus, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { searchUserAPI, createGroupAPI } from "../services/allAPI";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { groupCreatedResponseContext } from "../contexts/ResponseContextShare";
 
 
 function CreateGroup() {
@@ -14,6 +15,9 @@ function CreateGroup() {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [creating, setCreating] = useState(false);
   const naviagete = useNavigate()
+
+  //CONTEXTS
+  const {groupCreatedResponse,setGroupCreatedResponse} = useContext(groupCreatedResponseContext)
   
 
   // For holding users mapped by userId to improve lookup speed
@@ -81,6 +85,7 @@ function CreateGroup() {
         toast.success("Group created successfully!");
         setGroupName("");
         setSelectedUsers([]);
+        setGroupCreatedResponse(response.data)
         naviagete('/home')
       } else if (response.status === 400) {
         toast.warning("Add at least one member");
