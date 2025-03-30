@@ -13,9 +13,15 @@ import { deleteSingleMessageAPI } from "../services/allAPI";
 import { deleteSingleMsgResponseContext } from "../contexts/ResponseContextShare";
 
 function ChatArea() {
-  const { loggedUserData } = useContext(loggedUserDataContext);
-  const { messages, setMessages, selectedChat, socket, groupMessages } =
-    useChatContext();
+  const loggedUserData = JSON.parse(localStorage.getItem("user"));
+  const {
+    messages,
+    setMessages,
+    selectedChat,
+    socket,
+    setGroupMessages,
+    groupMessages,
+  } = useChatContext();
   const { allChatPreviewData, setAllChatPreviewData } = useContext(
     chatPreviewDataContext
   );
@@ -29,7 +35,7 @@ function ChatArea() {
 
   //FOR PRIVATE MESSAGE
   useEffect(() => {
-    if (selectedChat && messages) {
+    if (selectedChat && selectedChat.username) {
       setFilteredMessages(
         messages.filter(
           (msg) =>
@@ -47,27 +53,33 @@ function ChatArea() {
   //FOR GROUP CHAT
   useEffect(() => {
     if (selectedChat && selectedChat.name) {
-      console.log("Filtering Group Messages for:", selectedChat.name);
       const filtered =
         groupMessages?.filter((msg) => msg?.groupId === selectedChat?._id) ||
         [];
-      console.log("Filtered Group Messages:", filtered); // Debugging log
-      setFilteredGroupMessages(filtered);
+
+      const previousMessages = selectedChat?.groupMessages || [];
+
+      const mergedMessages = [
+        ...filtered,
+        ...previousMessages.filter(
+          (msg) => !filtered.some((existingMsg) => existingMsg._id === msg._id)
+        ),
+      ];
+
+      setFilteredGroupMessages(mergedMessages);
     } else {
       setFilteredGroupMessages([]);
     }
   }, [groupMessages, selectedChat]);
 
-
-
   //FOR LAST MESSAGE TIP
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
   useEffect(() => {
     scrollToBottom();
   }, [filteredMessages, filteredGroupMessages]);
-
 
   return (
     <div className="flex flex-col h-full">
@@ -110,13 +122,13 @@ function ChatArea() {
               <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-gray-50">
                 {filteredGroupMessages.map((message) => (
                   <MessageBubble
-                    key={message.newMessage._id}
-                    text={message.newMessage.content}
-                    timestamp={message.newMessage.createdAt}
-                    senderId={message.newMessage.senderId}
+                    key={message._id}
+                    text={message.content}
+                    timestamp={message.createdAt}
+                    senderId={message.senderId}
                     loggedInUserId={loggedUserData._id}
-                    image={message.isFile ? message.newMessage.content : null}
-                    deleteMsg={() => handleRemoveSingleMessage(message.newMessage._id)}
+                    image={message.isFile ? message.content : null}
+                    deleteMsg={() => handleRemoveSingleMessage(message._id)}
                   />
                 ))}
 

@@ -8,8 +8,9 @@ import {
   Check,
   X,
   Upload,
+  Edit,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   getMyAccountDetailsAPI,
   updateUsernameAPI,
@@ -23,7 +24,10 @@ function Account() {
   const [editing, setEditing] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
-  const {changeProfilePictureResponse, setChangeProfilePictureResponse} = useContext(changeProfilePictureResponseContext)
+  const { changeProfilePictureResponse, setChangeProfilePictureResponse } =
+    useContext(changeProfilePictureResponseContext);
+
+  const navigate = useNavigate();
 
   const fetchMyAccountDetails = async () => {
     setLoading(true);
@@ -45,7 +49,7 @@ function Account() {
 
   useEffect(() => {
     fetchMyAccountDetails();
-  }, []);
+  }, [changeProfilePictureResponse]);
 
   const handleUpdateUsername = async () => {
     try {
@@ -85,6 +89,7 @@ function Account() {
       };
 
       try {
+        setLoading(true);
         const user = JSON.parse(localStorage.getItem("user"));
         const id = user._id;
 
@@ -94,18 +99,29 @@ function Account() {
           reqHeader
         );
 
-        if (result.data.success) {
+        if (result.status == 200) {
           console.log("Image uploaded successfully:", result.data.profileImg);
-          setChangeProfilePictureResponse(result.data.profileImg)
+          setChangeProfilePictureResponse(result.data.profileImg);
+          setSelectedImage(null);
         } else {
           console.log("Upload failed:", result.data.message);
+          setSelectedImage(null);
         }
       } catch (error) {
         console.error("Error uploading image", error);
+        setSelectedImage(null);
+      } finally {
+        setLoading(false);
       }
-    }else{
+    } else {
       console.log("No token found");
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
   };
 
   return (
@@ -128,13 +144,13 @@ function Account() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-center flex-col gap-5 space-x-4">
+              <div className="flex md:items-start items-center justify-center flex-col gap-5 space-x-4">
                 {/* Profile Image or User Icon */}
                 {myDetails?.profileImg ? (
                   <img
                     src={myDetails.profileImg}
                     alt="Profile"
-                    className="w-28 h-28 rounded-full object-cover border-4 border-blue-600"
+                    className="w-28 h-28 rounded-full object-cover border-4"
                   />
                 ) : (
                   <div className="w-28 h-28 flex items-center justify-center bg-gray-200 rounded-full border-4 border-blue-600">
@@ -143,20 +159,32 @@ function Account() {
                 )}
 
                 {/* Edit Image Button */}
-                <label className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
-                  <Upload size={18} />
-                  <span>Edit Image</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => setSelectedImage(e.target.files[0])}
-                  />
-                </label>
-                {
-                  selectedImage &&
-                  <button onClick={handleUploadImage}>upload here</button>
-                }
+                {loading ? (
+                  <>
+                    <p className="text-center text-green-600">Uploading...!</p>
+                  </>
+                ) : selectedImage ? (
+                  <button
+                    className="bg-emerald-700 flex items-center gap-2 px-4 py-2 rounded-full text-white"
+                    onClick={handleUploadImage}
+                  >
+                    upload
+                    <Upload size={18} />
+                  </button>
+                ) : (
+                  <>
+                    <label className="cursor-pointer bg-gray-200 px-4 py-2 rounded-full hover:bg-blue-700 hover:text-white transition flex items-center gap-2">
+                      <Edit size={18} />
+                      <span>Edit Image</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => setSelectedImage(e.target.files[0])}
+                      />
+                    </label>
+                  </>
+                )}
               </div>
 
               <div className="space-y-4 mt-4">
@@ -216,7 +244,10 @@ function Account() {
                 Settings
               </h3>
               <nav className="space-y-2">
-                <button className="w-full flex items-center space-x-3 p-3 text-red-600 rounded-lg hover:bg-red-50 transition">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center space-x-3 p-3 text-red-600 rounded-lg hover:bg-red-50 transition"
+                >
                   <LogOut className="text-red-600" size={20} />
                   <span>Sign Out</span>
                 </button>
@@ -228,5 +259,4 @@ function Account() {
     </div>
   );
 }
- export default Account;
-
+export default Account;

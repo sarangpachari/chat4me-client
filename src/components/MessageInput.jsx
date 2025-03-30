@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Send, File, X, Loader } from "lucide-react";
 import { useChatContext } from "../contexts/ChatProvider";
-import { loggedUserDataContext } from "../contexts/DataContextShare";
 
 function MessageInput({ selectedChat }) {
   const [file, setFile] = useState(null);
@@ -10,7 +9,7 @@ function MessageInput({ selectedChat }) {
   const [uploading, setUploading] = useState(false);
 
   const { socket } = useChatContext();
-  const { loggedUserData } = useContext(loggedUserDataContext);
+  const  loggedUserData  = JSON.parse(localStorage.getItem("user"));
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
