@@ -8,7 +8,7 @@ import {
   searchUserAPI,
 } from "../services/allAPI";
 import { chatPreviewDataContext } from "../contexts/DataContextShare";
-import { groupCreatedResponseContext } from "../contexts/ResponseContextShare";
+import { groupCreatedResponseContext, permanentGroupDeleteResponseContext } from "../contexts/ResponseContextShare";
 
 function ChatList() {
   const { setAllChatPreviewData } = useContext(chatPreviewDataContext);
@@ -19,6 +19,8 @@ function ChatList() {
   const [users, setUsers] = useState([]);
   const loggedUserData = JSON.parse(localStorage.getItem("user"));
   const [myGroups, setMyGroups] = useState([]);
+    const {permanentGroupDeleteResponse,setPermanentGroupDeleteResponse}= useContext(permanentGroupDeleteResponseContext)
+  
 
   //CONTEXTS
   const { groupCreatedResponse, setGroupCreatedResponse } = useContext(
@@ -68,7 +70,7 @@ function ChatList() {
   useEffect(() => {
     fetchMessagedUsers();
     fetchMyGroups();
-  }, [groupCreatedResponse]);
+  }, [groupCreatedResponse,permanentGroupDeleteResponse]);
 
   const handleSearch = async (e) => {
     const query = e.target.value;
