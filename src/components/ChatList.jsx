@@ -20,8 +20,10 @@ function ChatList() {
   const loggedUserData = JSON.parse(localStorage.getItem("user"));
   const [myGroups, setMyGroups] = useState([]);
 
-   //CONTEXTS
-    const {groupCreatedResponse,setGroupCreatedResponse} = useContext(groupCreatedResponseContext)
+  //CONTEXTS
+  const { groupCreatedResponse, setGroupCreatedResponse } = useContext(
+    groupCreatedResponseContext
+  );
 
   const fetchMessagedUsers = async () => {
     const token = localStorage.getItem("token");
@@ -86,7 +88,6 @@ function ChatList() {
     setLoading(false);
   };
 
-  console.log(myGroups);
   return (
     <div className="flex flex-col h-full bg-white  rounded-xl">
       {/* Search Bar */}

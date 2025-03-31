@@ -48,29 +48,23 @@ function ChatArea() {
     } else {
       setFilteredMessages([]);
     }
-  }, [messages, selectedChat]);
+  }, [messages,selectedChat]);
 
-  //FOR GROUP CHAT
+  useEffect(() => {
+    if (selectedChat?._id && selectedChat?.name) {
+      socket.emit("joinGroup", { userId: loggedUserData._id, groupId: selectedChat._id });
+    }
+  }, [selectedChat, socket]);
+
   useEffect(() => {
     if (selectedChat && selectedChat.name) {
-      const filtered =
-        groupMessages?.filter((msg) => msg?.groupId === selectedChat?._id) ||
-        [];
-
-      const previousMessages = selectedChat?.groupMessages || [];
-
-      const mergedMessages = [
-        ...filtered,
-        ...previousMessages.filter(
-          (msg) => !filtered.some((existingMsg) => existingMsg._id === msg._id)
-        ),
-      ];
-
-      setFilteredGroupMessages(mergedMessages);
+      setFilteredGroupMessages(groupMessages[selectedChat._id] ? [...groupMessages[selectedChat._id]] : []);
     } else {
       setFilteredGroupMessages([]);
     }
-  }, [groupMessages, selectedChat]);
+  }, [groupMessages[selectedChat?._id], selectedChat]);
+  
+  
 
   //FOR LAST MESSAGE TIP
   const scrollToBottom = () => {
@@ -80,6 +74,9 @@ function ChatArea() {
   useEffect(() => {
     scrollToBottom();
   }, [filteredMessages, filteredGroupMessages]);
+
+  console.log(filteredGroupMessages);
+  
 
   return (
     <div className="flex flex-col h-full">
@@ -120,9 +117,9 @@ function ChatArea() {
               />
 
               <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-gray-50">
-                {filteredGroupMessages.map((message) => (
+                {filteredGroupMessages.map((message,index) => (
                   <MessageBubble
-                    key={message._id}
+                    key={index}
                     text={message.content}
                     timestamp={message.createdAt}
                     senderId={message.senderId}
