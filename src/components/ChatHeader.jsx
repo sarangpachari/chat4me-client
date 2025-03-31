@@ -1,9 +1,10 @@
 import React, { useContext, useState } from "react";
 import { useChatContext } from "../contexts/ChatProvider";
 import default_avatar from "../assets/default-avatar.svg";
-import { clearAllChatsAPI, getMyAccountDetailsAPI } from "../services/allAPI";
+import { clearAllChatsAPI, deleteGroupAPI, getMyAccountDetailsAPI } from "../services/allAPI";
 import { MoreVertical, UserCircle, Trash2, XIcon } from "lucide-react";
 import { Link } from "react-router-dom";
+import { WiAlien } from "react-icons/wi";
 // import default_avatar from "../assets/default-avatar.svg";
 
 function ChatHeader({ name, avatar, userId, groupId }) {
@@ -93,6 +94,36 @@ function ChatHeader({ name, avatar, userId, groupId }) {
     setShowDeleteModal(false);
   };
 
+  // delete group
+  const handleDeleteGroup = async () => {
+    const token = localStorage.getItem("token");
+    const loggedUser = JSON.parse(localStorage.getItem("user"));
+    let id = loggedUser._id;
+  
+    if (!token) {
+      console.error("No token found, please log in.");
+      return;
+    }
+  
+    const reqHeader = { Authorization: token };
+    const reqBody = { groupId };
+  
+    try {
+      const response = await deleteGroupAPI(id, reqBody, reqHeader);
+      console.log(response);
+  
+      if (response.status === 200) {
+        alert("Group deleted successfully");
+      } else {
+        alert("Failed to delete group");
+      }
+    } catch (error) {
+      console.error("Error deleting group:", error);
+      alert("Internal Server Error");
+    }
+  };
+  
+
   return (
     <>
       <div className="p-3 sm:p-4 bg-white border-b border-gray-200 flex items-center justify-between flex-shrink-0">
@@ -146,13 +177,20 @@ function ChatHeader({ name, avatar, userId, groupId }) {
                   </button>
                 </Link>
               )}
-              <button
+              {groupId && (
+                <button className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  onClick={handleDeleteGroup}>
+                  <UserCircle className="w-4 h-4 mr-2" />
+                  Delete Group
+                </button>
+              )}
+              {userId && (<button
                 onClick={handleClearChat}
                 className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Clear Chat
-              </button>
+              </button>)}
             </div>
           )}
         </div>
