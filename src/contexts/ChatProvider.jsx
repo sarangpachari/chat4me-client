@@ -1,13 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import socket from "../services/socket";
-import { loggedUserDataContext } from "./DataContextShare";
 
 const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
-  const { loggedUserData } = useContext(loggedUserDataContext);
-  const user = loggedUserData;
-
+  const [user, setUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null); // Currently active chat
   const [chatPreviewData, setChatPreviewData] = useState([]); // Chat list
@@ -36,11 +33,29 @@ export const ChatProvider = ({ children }) => {
         setMessages((prev) => [...prev, newFile]);
       });
 
-      socket.on("joinedGroups", (groups) => setJoinedGroups(groups));
-      
-      socket.on("groupMessage", (newMessage) => {
-        setGroupMessages((prev) => [...prev, newMessage]);
+      socket.on("joinGroup", (groups) => {
+        setJoinedGroups(groups);
       });
+
+      socket.on("groupMessage", ({ groupId, newMessage }) => {
+
+        setGroupMessages((prevMessages) => {
+          const updatedMessages = { ...prevMessages }; 
+          updatedMessages[groupId] = [
+            ...(updatedMessages[groupId] || []),
+            newMessage
+          ];
+          return updatedMessages;  
+        });
+      });
+
+      socket.on("previousGroupMessages", ({ groupId, groupMessages }) => {
+        setGroupMessages((prevMessages) => ({
+          ...prevMessages,
+          [groupId]: groupMessages,
+        }));
+      });
+
       socket.on("receiveGroupFile", ({ groupId, fileMessage }) => {
         setGroupMessages((prev) => [...prev, { groupId, ...fileMessage }]);
       });
@@ -51,6 +66,7 @@ export const ChatProvider = ({ children }) => {
         socket.off("receiveFile");
         socket.off("joinedGroups");
         socket.off("groupMessage");
+        socket.off("previousChats");  
         socket.off("receiveGroupFile");
         socket.disconnect();
       };
@@ -60,6 +76,7 @@ export const ChatProvider = ({ children }) => {
   return (
     <ChatContext.Provider
       value={{
+        setUser,
         messages,
         setMessages,
         selectedChat,
