@@ -5,6 +5,7 @@ import { clearAllChatsAPI, deleteGroupAPI, getMyAccountDetailsAPI } from "../ser
 import { MoreVertical, UserCircle, Trash2, XIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { WiAlien } from "react-icons/wi";
+import { permanentGroupDeleteResponseContext } from "../contexts/ResponseContextShare";
 // import default_avatar from "../assets/default-avatar.svg";
 
 function ChatHeader({ name, avatar, userId, groupId }) {
@@ -13,6 +14,7 @@ function ChatHeader({ name, avatar, userId, groupId }) {
   const [viewProfileData, setViewProfileData] = useState(null);
   const [loading, setLoading] = useState(false);
   const { setSelectedChat, setMessages } = useChatContext();
+  const {permanentGroupDeleteResponse,setPermanentGroupDeleteResponse}= useContext(permanentGroupDeleteResponseContext)
 
   //VIEW USER INFO
   const handleViewUserInfo = async () => {
@@ -114,6 +116,8 @@ function ChatHeader({ name, avatar, userId, groupId }) {
   
       if (response.status === 200) {
         alert("Group deleted successfully");
+        setPermanentGroupDeleteResponse(response.data)
+        setSelectedChat(null)
       } else {
         alert("Failed to delete group");
       }
@@ -181,7 +185,7 @@ function ChatHeader({ name, avatar, userId, groupId }) {
                 <button className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                   onClick={handleDeleteGroup}>
                   <UserCircle className="w-4 h-4 mr-2" />
-                  Delete Group
+                  Delete Group Permanently
                 </button>
               )}
               {userId && (<button

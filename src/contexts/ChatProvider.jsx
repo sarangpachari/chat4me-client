@@ -57,7 +57,16 @@ export const ChatProvider = ({ children }) => {
       });
 
       socket.on("receiveGroupFile", ({ groupId, fileMessage }) => {
-        setGroupMessages((prev) => [...prev, { groupId, ...fileMessage }]);
+        console.log("FILE MSG:",fileMessage);
+        
+        setGroupMessages((prevMessages) => {
+          const updatedMessages = { ...prevMessages }; 
+          updatedMessages[groupId] = [
+            ...(updatedMessages[groupId] || []),
+            fileMessage
+          ];
+          return updatedMessages;  
+        });
       });
 
       return () => {
