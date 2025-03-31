@@ -13,8 +13,15 @@ import { deleteSingleMessageAPI } from "../services/allAPI";
 import { deleteSingleMsgResponseContext } from "../contexts/ResponseContextShare";
 
 function ChatArea() {
-  const { loggedUserData } = useContext(loggedUserDataContext);
-  const { messages, setMessages, selectedChat, socket } = useChatContext();
+  const loggedUserData = JSON.parse(localStorage.getItem("user"));
+  const {
+    messages,
+    setMessages,
+    selectedChat,
+    socket,
+    setGroupMessages,
+    groupMessages,
+  } = useChatContext();
   const { allChatPreviewData, setAllChatPreviewData } = useContext(
     chatPreviewDataContext
   );
@@ -24,9 +31,11 @@ function ChatArea() {
 
   const messagesEndRef = useRef(null);
   const [filteredMessages, setFilteredMessages] = useState([]);
+  const [filteredGroupMessages, setFilteredGroupMessages] = useState([]);
 
+  //FOR PRIVATE MESSAGE
   useEffect(() => {
-    if (selectedChat) {
+    if (selectedChat && selectedChat.username) {
       setFilteredMessages(
         messages.filter(
           (msg) =>
@@ -36,16 +45,38 @@ function ChatArea() {
               msg.receiverId === selectedChat._id)
         )
       );
+    } else {
+      setFilteredMessages([]);
     }
-  }, [messages, selectedChat]);
+  }, [messages,selectedChat]);
 
+  useEffect(() => {
+    if (selectedChat?._id && selectedChat?.name) {
+      socket.emit("joinGroup", { userId: loggedUserData._id, groupId: selectedChat._id });
+    }
+  }, [selectedChat, socket]);
+
+  useEffect(() => {
+    if (selectedChat && selectedChat.name) {
+      setFilteredGroupMessages(groupMessages[selectedChat._id] ? [...groupMessages[selectedChat._id]] : []);
+    } else {
+      setFilteredGroupMessages([]);
+    }
+  }, [groupMessages[selectedChat?._id], selectedChat]);
+  
+  
+
+  //FOR LAST MESSAGE TIP
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-  
+
   useEffect(() => {
     scrollToBottom();
-  }, [filteredMessages]);
+  }, [filteredMessages, filteredGroupMessages]);
+
+  console.log(filteredGroupMessages);
+  
 
   return (
     <div className="flex flex-col h-full">
@@ -74,7 +105,7 @@ function ChatArea() {
                 <div ref={messagesEndRef} />
               </div>
 
-              <MessageInput selectedUser={selectedChat} />
+              <MessageInput selectedChat={selectedChat} />
             </>
           )}
           {selectedChat?.name && (
@@ -86,21 +117,22 @@ function ChatArea() {
               />
 
               <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-gray-50">
-                {filteredMessages.map((message) => (
+                {filteredGroupMessages.map((message,index) => (
                   <MessageBubble
-                    key={message._id}
-                    text={message.chat}
+                    key={index}
+                    text={message.content}
                     timestamp={message.createdAt}
                     senderId={message.senderId}
                     loggedInUserId={loggedUserData._id}
-                    image={message.isFile ? message.chat : null} // 🟢 Pass file URL if it's a file
+                    image={message.isFile ? message.content : null}
                     deleteMsg={() => handleRemoveSingleMessage(message._id)}
                   />
                 ))}
+
                 <div ref={messagesEndRef} />
               </div>
 
-              <MessageInput selectedUser={selectedChat} />
+              <MessageInput selectedChat={selectedChat} />
             </>
           )}
         </>

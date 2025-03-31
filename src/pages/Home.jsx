@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
-import Sidebar from '../components/SideBar';
-import ChatArea from '../components/ChatArea';
-import { Menu } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import Sidebar from "../components/SideBar";
+import ChatArea from "../components/ChatArea";
+import { Menu } from "lucide-react";
+import { useChatContext } from "../contexts/ChatProvider";
 
 function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { setUser } = useChatContext();
+  const user = JSON.parse(localStorage.getItem("user"))
+
+  useEffect(() => {
+    setUser(user);
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
@@ -17,12 +24,14 @@ function Home() {
       </button>
 
       {/* Sidebar with responsive classes */}
-      <div className={` 
+      <div
+        className={` 
         fixed lg:relative inset-y-0 left-0 z-40 w-[280px] sm:w-[320px]
-        transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0 transition-transform duration-300 ease-in-out
         bg-white border-r border-gray-200
-      `}>
+      `}
+      >
         <Sidebar />
       </div>
 

@@ -122,7 +122,7 @@ export const getGroupAPI = async (id, reqHeader) => {
 //DELETE GROUP MEMBERS API
 export const deleteGroupMembersAPI = async (id,reqBody, reqHeader) => {
   return await commonAPI(
-    "PUT",
+    "DELETE",
     `${SERVER_BASE_URL}/grp/group-remove-user/${id}`,
     reqBody,
     reqHeader
