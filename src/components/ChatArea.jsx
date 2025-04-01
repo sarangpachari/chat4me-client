@@ -79,7 +79,7 @@ function ChatArea() {
   
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-lvh">
       {selectedChat ? (
         <>
           {selectedChat.username && (
