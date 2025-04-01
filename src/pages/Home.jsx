@@ -14,7 +14,7 @@ function Home() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-lvh bg-gray-100 overflow-hidden">
       {/* Mobile menu button (moved to the right) */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}

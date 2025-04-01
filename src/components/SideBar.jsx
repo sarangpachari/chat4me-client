@@ -49,7 +49,7 @@ function SideBar() {
   }, [changeProfilePictureResponse]);
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 shadow-xl rounded-lg">
+    <div className="flex flex-col h-lvh bg-gray-50 shadow-xl rounded-lg">
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-white">
         <h1 className="text-lg font-semibold text-gray-800">Messages</h1>
