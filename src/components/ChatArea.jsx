@@ -90,7 +90,7 @@ function ChatArea() {
                 userId={selectedChat?._id}
               />
 
-              <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-gray-50">
+              <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-emerald-50">
                 {filteredMessages.map((message) => (
                   <MessageBubble
                     key={message._id}
@@ -114,15 +114,19 @@ function ChatArea() {
                 name={selectedChat?.name}
                 avatar={selectedChat?.groupIcon}
                 groupId={selectedChat?._id}
+                memberCount={selectedChat?.groupMembers.length}
+                members = {selectedChat?.groupMembers}
               />
 
-              <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-gray-50">
+              <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-emerald-50">
                 {filteredGroupMessages.map((message,index) => (
                   <MessageBubble
                     key={index}
                     text={message.content}
                     timestamp={message.createdAt}
                     senderId={message.senderId}
+                    senderName={message.senderName}
+                    senderIcon={message.senderIcon}
                     loggedInUserId={loggedUserData._id}
                     image={message.isFile ? message.content : null}
                     deleteMsg={() => handleRemoveSingleMessage(message._id)}

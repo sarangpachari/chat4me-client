@@ -2,10 +2,22 @@ import React, { useState } from "react";
 import moment from "moment";
 import { Edit2, Trash2 } from "lucide-react";
 
-function MessageBubble({ text, timestamp, senderId, loggedInUserId, deleteMsg, messageId }) {
+function MessageBubble({
+  text,
+  timestamp,
+  senderId,
+  loggedInUserId,
+  deleteMsg,
+  messageId,
+  senderName,
+  senderIcon,
+}) {
   const isSentByUser = senderId === loggedInUserId;
   const [showContextMenu, setShowContextMenu] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [contextMenuPosition, setContextMenuPosition] = useState({
+    x: 0,
+    y: 0,
+  });
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editedText, setEditedText] = useState(text);
@@ -62,12 +74,22 @@ function MessageBubble({ text, timestamp, senderId, loggedInUserId, deleteMsg, m
         onContextMenu={handleContextMenu}
       >
         <div
-          className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-3 sm:px-4 py-2 shadow-md ${
+          className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-3 sm:px-4 py-2 shadow-lg relative mt-4 ${
             isSentByUser
-              ? "bg-blue-500 text-white rounded-br-none"
-              : "bg-gray-200 text-black rounded-bl-none"
+              ? "bg-emerald-700 text-white rounded-br-none"
+              : "bg-emerald-100 text-black rounded-bl-none"
           }`}
         >
+          {senderName && (
+            <p
+              className={`text-xs sm:text-xs font-semibold mb-1 ${
+                isSentByUser ? "text-yellow-200" : "text-emerald-700"
+              }`}
+            >
+              {senderName}
+            </p>
+          )}
+
           {isImageMessage ? (
             <img
               src={text}
@@ -77,13 +99,28 @@ function MessageBubble({ text, timestamp, senderId, loggedInUserId, deleteMsg, m
           ) : (
             <p className="text-sm sm:text-base">{text}</p>
           )}
+
           <p
             className={`text-[10px] sm:text-xs mt-1 ${
-              isSentByUser ? "text-blue-200" : "text-gray-600"
+              isSentByUser ? "text-emerald-200" : "text-gray-600"
             }`}
           >
-            {timestamp ? moment(timestamp).format("hh:mm A") : "Time Unknown"}
+            {timestamp
+              ? moment(timestamp).format("DD MMM YYYY, hh:mm A")
+              : "Time Unknown"}
           </p>
+
+          {senderIcon && (
+            <img
+              src={senderIcon}
+              alt="Sender"
+              className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full absolute ${
+                isSentByUser
+                  ? "right-[-10px] top-[-10px]"
+                  : "left-[-10px] bottom-[-20px]"
+              }`}
+            />
+          )}
         </div>
       </div>
 
@@ -154,7 +191,8 @@ function MessageBubble({ text, timestamp, senderId, loggedInUserId, deleteMsg, m
           <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
             <h3 className="text-lg font-semibold mb-4">Delete Message</h3>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete this message? This action cannot be undone.
+              Are you sure you want to delete this message? This action cannot
+              be undone.
             </p>
             <div className="flex justify-end space-x-3">
               <button

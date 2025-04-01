@@ -1,20 +1,27 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useChatContext } from "../contexts/ChatProvider";
 import default_avatar from "../assets/default-avatar.svg";
-import { clearAllChatsAPI, deleteGroupAPI, getMyAccountDetailsAPI } from "../services/allAPI";
+import {
+  clearAllChatsAPI,
+  deleteGroupAPI,
+  getMyAccountDetailsAPI,
+} from "../services/allAPI";
 import { MoreVertical, UserCircle, Trash2, XIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { WiAlien } from "react-icons/wi";
 import { permanentGroupDeleteResponseContext } from "../contexts/ResponseContextShare";
 // import default_avatar from "../assets/default-avatar.svg";
 
-function ChatHeader({ name, avatar, userId, groupId }) {
+function ChatHeader({ name, avatar, userId, groupId, memberCount, members }) {
   const { onlineUsers } = useChatContext();
   const isOnline = onlineUsers.includes(userId);
+
   const [viewProfileData, setViewProfileData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [groupOnlineMembersCount,setGroupOnlineMembersCount] = useState(null)
   const { setSelectedChat, setMessages } = useChatContext();
-  const {permanentGroupDeleteResponse,setPermanentGroupDeleteResponse}= useContext(permanentGroupDeleteResponseContext)
+  const { permanentGroupDeleteResponse, setPermanentGroupDeleteResponse } =
+    useContext(permanentGroupDeleteResponseContext);
 
   //VIEW USER INFO
   const handleViewUserInfo = async () => {
@@ -101,23 +108,23 @@ function ChatHeader({ name, avatar, userId, groupId }) {
     const token = localStorage.getItem("token");
     const loggedUser = JSON.parse(localStorage.getItem("user"));
     let id = loggedUser._id;
-  
+
     if (!token) {
       console.error("No token found, please log in.");
       return;
     }
-  
+
     const reqHeader = { Authorization: token };
     const reqBody = { groupId };
-  
+
     try {
       const response = await deleteGroupAPI(id, reqBody, reqHeader);
       console.log(response);
-  
+
       if (response.status === 200) {
         alert("Group deleted successfully");
-        setPermanentGroupDeleteResponse(response.data)
-        setSelectedChat(null)
+        setPermanentGroupDeleteResponse(response.data);
+        setSelectedChat(null);
       } else {
         alert("Failed to delete group");
       }
@@ -126,7 +133,15 @@ function ChatHeader({ name, avatar, userId, groupId }) {
       alert("Internal Server Error");
     }
   };
-  
+
+  useEffect(() => { 
+    if (members) {
+      const groupOnlineCount = members.filter((user) =>
+        onlineUsers.includes(user)
+      ).length;
+      setGroupOnlineMembersCount(groupOnlineCount)
+    }
+  }, [onlineUsers]);
 
   return (
     <>
@@ -146,9 +161,20 @@ function ChatHeader({ name, avatar, userId, groupId }) {
             <h2 className="text-base sm:text-lg font-semibold text-gray-800">
               {name}
             </h2>
-            <p className="text-xs sm:text-sm text-green-500">
-              {isOnline ? "Online" : "Offline"}
-            </p>
+            {groupId ? (
+              <div className="flex gap-2">
+                <p className="text-xs sm:text-sm text-green-500">
+                  {memberCount} Participants
+                </p>
+                <p className="text-xs sm:text-sm text-green-500">
+                  {groupOnlineMembersCount} Online
+                </p>
+              </div>
+            ) : (
+              <p className="text-xs sm:text-sm text-green-500">
+                {isOnline ? "Online" : "Offline"}
+              </p>
+            )}
           </div>
         </div>
 
@@ -162,39 +188,47 @@ function ChatHeader({ name, avatar, userId, groupId }) {
 
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200">
-              {userId && (<button
-                onClick={() => {
-                  setShowDropdown(false);
-                  handleViewUserInfo();
-                }}
-                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                <UserCircle className="w-4 h-4 mr-2" />
-                Chat Profile
-              </button>)}
+              {userId && (
+                <button
+                  onClick={() => {
+                    setShowDropdown(false);
+                    handleViewUserInfo();
+                  }}
+                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  <UserCircle className="w-4 h-4 mr-2" />
+                  Chat Profile
+                </button>
+              )}
 
               {groupId && (
                 <Link to={`/group-info/${groupId}`}>
-                  <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    <UserCircle className="w-4 h-4 mr-2" />
+                  <button className="flex items-center px-4 py-4 gap-6 text-sm text-gray-700 hover:bg-gray-100">
+                    <UserCircle size={22} />
                     Group Profile
                   </button>
                 </Link>
               )}
               {groupId && (
-                <button className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                  onClick={handleDeleteGroup}>
-                  <UserCircle className="w-4 h-4 mr-2" />
-                  Delete Group Permanently
+                <>
+                  <button
+                    className="flex items-center px-4 py-4 gap-2 text-sm text-red-600 hover:bg-gray-100"
+                    onClick={handleDeleteGroup}
+                  >
+                    <Trash2 size={28} />
+                    Delete Group Permanently
+                  </button>
+                </>
+              )}
+              {userId && (
+                <button
+                  onClick={handleClearChat}
+                  className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Clear Chat
                 </button>
               )}
-              {userId && (<button
-                onClick={handleClearChat}
-                className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Clear Chat
-              </button>)}
             </div>
           )}
         </div>
