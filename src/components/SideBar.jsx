@@ -7,6 +7,7 @@ import { MdAccountCircle } from "react-icons/md";
 import { IoIosLogOut } from "react-icons/io";
 import { getMyAccountDetailsAPI } from "../services/allAPI";
 import { changeProfilePictureResponseContext } from "../contexts/ResponseContextShare";
+import { useChatContext } from "../contexts/ChatProvider";
 
 function SideBar() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ function SideBar() {
   const [myDetails, setMyDetails] = useState({});
   const { loggedUserData, setLoggedUserData } = useContext(loggedUserDataContext);
   const { changeProfilePictureResponse } = useContext(changeProfilePictureResponseContext);
+  const { setUser } = useChatContext();
 
   const userData = JSON.parse(localStorage.getItem("user"));
 
@@ -23,6 +25,7 @@ function SideBar() {
     setLoggedUserData(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    setUser(null)
     navigate("/");
   };
 

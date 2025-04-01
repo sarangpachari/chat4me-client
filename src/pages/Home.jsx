@@ -7,10 +7,10 @@ import { useChatContext } from "../contexts/ChatProvider";
 function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { setUser } = useChatContext();
-  const user = JSON.parse(localStorage.getItem("user"))
+  const thisUser = JSON.parse(localStorage.getItem("user"))
 
   useEffect(() => {
-    setUser(user);
+    setUser(thisUser);
   }, []);
 
   return (

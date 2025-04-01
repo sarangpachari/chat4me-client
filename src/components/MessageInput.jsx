@@ -39,6 +39,8 @@ function MessageInput({ selectedChat }) {
       if (selectedChat.name) {
         socket.emit("sendGroupFile", {
           senderId: loggedUserData._id,
+          senderName :loggedUserData.username, 
+          senderIcon: loggedUserData.profileImg,
           groupId: selectedChat._id,
           file,
         });
@@ -53,6 +55,8 @@ function MessageInput({ selectedChat }) {
       if (selectedChat.name) {
         socket.emit("groupMessage", {
           senderId: loggedUserData._id,
+          senderName :loggedUserData.username, 
+          senderIcon: loggedUserData.profileImg,
           groupId: selectedChat._id,
           content: message,
         });
