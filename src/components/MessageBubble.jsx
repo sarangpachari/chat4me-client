@@ -145,13 +145,15 @@ function MessageBubble({
               <Edit2 className="w-4 h-4 mr-2" />
               Edit Message
             </button>
-            <button
-              onClick={handleDelete}
-              className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete Message
-            </button>
+            {deleteMsg && (
+              <button
+                onClick={handleDelete}
+                className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Message
+              </button>
+            )}
           </div>
         </>
       )}

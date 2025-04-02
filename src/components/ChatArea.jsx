@@ -11,6 +11,7 @@ import {
 import { FaRegMessage } from "react-icons/fa6";
 import { deleteSingleMessageAPI } from "../services/allAPI";
 import { deleteSingleMsgResponseContext } from "../contexts/ResponseContextShare";
+import { toast, ToastContainer } from "react-toastify";
 
 function ChatArea() {
   const loggedUserData = JSON.parse(localStorage.getItem("user"));
@@ -33,6 +34,29 @@ function ChatArea() {
   const [filteredMessages, setFilteredMessages] = useState([]);
   const [filteredGroupMessages, setFilteredGroupMessages] = useState([]);
 
+  const handleRemoveSingleMessage = async (id) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const reqHeader = {
+        Authorization: token,
+      };
+      try {
+        const result = await deleteSingleMessageAPI(id,reqHeader);
+        if (result.status == 200) {
+          setSingleDeleteMsgResponse(result.data);
+          setMessages(messages.filter((message) => message._id != id));
+          toast.success("Message Deleted !");
+        } else if (result.status == 400) {
+          toast.warning("Message not Found !");
+        } else {
+          toast.error("Error Occured !");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
   //FOR PRIVATE MESSAGE
   useEffect(() => {
     if (selectedChat && selectedChat.username) {
@@ -48,23 +72,28 @@ function ChatArea() {
     } else {
       setFilteredMessages([]);
     }
-  }, [messages,selectedChat]);
+  }, [messages, selectedChat]);
 
   useEffect(() => {
     if (selectedChat?._id && selectedChat?.name) {
-      socket.emit("joinGroup", { userId: loggedUserData._id, groupId: selectedChat._id });
+      socket.emit("joinGroup", {
+        userId: loggedUserData._id,
+        groupId: selectedChat._id,
+      });
     }
   }, [selectedChat, socket]);
 
   useEffect(() => {
     if (selectedChat && selectedChat.name) {
-      setFilteredGroupMessages(groupMessages[selectedChat._id] ? [...groupMessages[selectedChat._id]] : []);
+      setFilteredGroupMessages(
+        groupMessages[selectedChat._id]
+          ? [...groupMessages[selectedChat._id]]
+          : []
+      );
     } else {
       setFilteredGroupMessages([]);
     }
   }, [groupMessages[selectedChat?._id], selectedChat]);
-  
-  
 
   //FOR LAST MESSAGE TIP
   const scrollToBottom = () => {
@@ -74,9 +103,6 @@ function ChatArea() {
   useEffect(() => {
     scrollToBottom();
   }, [filteredMessages, filteredGroupMessages]);
-
-  console.log(filteredGroupMessages);
-  
 
   return (
     <div className="flex flex-col h-lvh">
@@ -98,7 +124,7 @@ function ChatArea() {
                     timestamp={message.createdAt}
                     senderId={message.senderId}
                     loggedInUserId={loggedUserData._id}
-                    image={message.isFile ? message.chat : null} // 🟢 Pass file URL if it's a file
+                    image={message.isFile ? message.chat : null}
                     deleteMsg={() => handleRemoveSingleMessage(message._id)}
                   />
                 ))}
@@ -115,11 +141,11 @@ function ChatArea() {
                 avatar={selectedChat?.groupIcon}
                 groupId={selectedChat?._id}
                 memberCount={selectedChat?.groupMembers.length}
-                members = {selectedChat?.groupMembers}
+                members={selectedChat?.groupMembers}
               />
 
               <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-emerald-50">
-                {filteredGroupMessages.map((message,index) => (
+                {filteredGroupMessages.map((message, index) => (
                   <MessageBubble
                     key={index}
                     text={message.content}
@@ -129,7 +155,6 @@ function ChatArea() {
                     senderIcon={message.senderIcon}
                     loggedInUserId={loggedUserData._id}
                     image={message.isFile ? message.content : null}
-                    deleteMsg={() => handleRemoveSingleMessage(message._id)}
                   />
                 ))}
 
@@ -154,6 +179,7 @@ function ChatArea() {
           </div>
         </div>
       )}
+      <ToastContainer />
     </div>
   );
 }

@@ -6,6 +6,8 @@ import {
   Save,
   Plus,
   ArrowBigLeft,
+  PlusSquareIcon,
+  User,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -137,18 +139,20 @@ function GroupInfo() {
     }
   };
 
+  
+
   return (
     <>
-      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-emerald-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <Link to={"/home"}>
-              <button className="flex items-center space-x-2  mb-6 text-blue-600 font-semibold py-2 px-4 rounded-lg w-52  transition duration-300">
+              <button className="flex items-center space-x-2  mb-6 text-emerald-600 font-semibold py-2 px-2 rounded-lg border mt-5 ms-5  transition duration-300">
                 <ArrowBigLeft className="w-5 h-5" />
                 <span>Back to Home</span>
               </button>
             </Link>
-            <div className="px-6 py-8 bg-gradient-to-r from-blue-500 to-blue-600">
+            <div className="px-6 py-8 bg-gradient-to-bl from-emerald-400 to-emerald-800">
               <div className="flex items-center justify-between">
                 {isEditingName ? (
                   <div className="flex items-center gap-2">
@@ -166,7 +170,7 @@ function GroupInfo() {
                     </button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2  border p-4 rounded-lg shadow-xl border-none bg-gray-50/10">
                     <h1 className="text-2xl font-bold text-white">
                       {groupName}
                     </h1>
@@ -178,12 +182,12 @@ function GroupInfo() {
                     </button>
                   </div>
                 )}
-                <div className="flex flex-col">
-                  <p className="text-white mb-2">
+                <div className="flex flex-col gap-1">
+                  <p className="text-white md:text-lg text-sm">
                     Created by: {details.createdBy}
                   </p>
-                  <p className="text-white">
-                    Created at:{" "}
+                  <p className="text-white md:text-lg text-sm">
+                    Created At:{" "}
                     {moment(details.createdAt)
                       .utcOffset(5.5)
                       .format("DD MMM YYYY - h:mm A")}
@@ -192,25 +196,26 @@ function GroupInfo() {
               </div>
             </div>
 
-            <div className="px-6 py-4 border-b">
+            <div className="px-6 py-4">
+              <p className="mb-4 text-sm md:text-lg flex items-center gap-2"> <PlusSquareIcon/> Add new participants</p>
               <input
                 type="text"
                 placeholder="Search for a user..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-emerald-500"
               />
               {searchResults.length > 0 && (
-                <div className="mt-2 bg-white shadow-lg rounded-lg max-h-40 overflow-auto">
+                <div className="mt-2 p-4 bg-emerald-100 shadow-lg rounded-lg max-h-40 overflow-auto">
                   {searchResults.map((user) => (
                     <div
                       key={user._id}
-                      className="p-2 flex justify-between items-center hover:bg-gray-100 cursor-pointer border-b"
+                      className="p-2 flex justify-between bg-emerald-100 items-center hover:bg-gray-100 cursor-pointer rounded-xl"
                     >
                       <span className="text-gray-800">{user.username}</span>
                       <button
                         onClick={() => handleAddMember(user._id)}
-                        className="p-1 text-blue-600 hover:text-blue-800"
+                        className="p-1 text-emerald-800 hover:text-blue-800"
                       >
                         <Plus size={20} />
                       </button>
@@ -220,19 +225,20 @@ function GroupInfo() {
               )}
             </div>
 
-            <div className="px-6 py-4">
+            <div className="px-6 py-4 bg-emerald-100">
               <div className="grid gap-4">
+                <p className="flex items-center gap-2 text-sm md:text-lg"><User/><span className="text-slate-800 font-medium">{details.groupMembers?.length}</span> Participants </p>
                 {details.groupMembers?.map((member) => (
                   <div
                     key={member._id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex items-center justify-between p-4 bg-emerald-700 rounded-lg hover:bg-emerald-400 transition-colors"
                   >
-                    <h3 className="font-medium text-gray-900">
+                    <h3 className="font-medium text-white">
                       {member.username}
                     </h3>
                     <button
                       onClick={() => handleDeleteMember(member._id)}
-                      className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
+                      className="p-2 text-white hover:bg-red-500 rounded-full transition-colors"
                     >
                       <Trash2 size={20} />
                     </button>
