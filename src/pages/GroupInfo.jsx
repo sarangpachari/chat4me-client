@@ -183,10 +183,10 @@ function GroupInfo() {
                   </div>
                 )}
                 <div className="flex flex-col gap-1">
-                  <p className="text-white md:text-lg text-sm">
+                  <p className="text-white md:text-base text-sm">
                     Created by: {details.createdBy}
                   </p>
-                  <p className="text-white md:text-lg text-sm">
+                  <p className="text-white md:text-base text-sm">
                     Created At:{" "}
                     {moment(details.createdAt)
                       .utcOffset(5.5)

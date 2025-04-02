@@ -164,7 +164,7 @@ function ChatHeader({ name, avatar, userId, groupId, memberCount, members }) {
             {groupId ? (
               <div className="flex gap-2">
                 <p className="text-xs sm:text-sm text-green-500">
-                  {memberCount} Participants
+                  {memberCount+1} Participants
                 </p>
                 <p className="text-xs sm:text-sm text-green-500">
                   {groupOnlineMembersCount} Online
