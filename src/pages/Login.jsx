@@ -26,6 +26,15 @@ const Login = () => {
     loggedUserDataContext
   );
 
+  //CHECK USER LOGINNED OR NOT
+  const sessionChecking = ()=>{
+    if(localStorage.getItem("token")){
+      navigate("/home")
+    }else{
+      return null
+    }
+  }
+
   //TAB NAMES
   const steps = ["Welcome", "Email", "OTP", "Username"];
 
@@ -118,6 +127,10 @@ const Login = () => {
       }
     }
   };
+
+  useEffect(()=>{
+    sessionChecking()
+  },[])
 
 
   return (
