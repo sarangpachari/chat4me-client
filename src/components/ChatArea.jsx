@@ -141,7 +141,7 @@ function ChatArea() {
                 avatar={selectedChat?.groupIcon}
                 groupId={selectedChat?._id}
                 memberCount={selectedChat?.groupMembers.length}
-                members={selectedChat?.groupMembers}
+                members={[selectedChat?.createdBy, ...(selectedChat?.groupMembers || [])]}
               />
 
               <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-emerald-50">
