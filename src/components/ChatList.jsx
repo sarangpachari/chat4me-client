@@ -121,7 +121,7 @@ function ChatList() {
                   avatar={group.groupIcon}
                   lastMessage="Tap to Chat"
                   isGroup={true}
-                  memberCount={group.groupMembers.length}
+                  memberCount={group.groupMembers.length+1}
                   onClick={() => {
                     setAllChatPreviewData(group);
                     setSelectedChat(group);
