@@ -78,7 +78,7 @@ function ChatList() {
 
     if (!query) return setSearchResults([]);
 
-    setLoading(true);
+   
     try {
       const { data } = await searchUserAPI(query);
 
@@ -87,7 +87,6 @@ function ChatList() {
       console.error("Search error:", error);
       setSearchResults([]);
     }
-    setLoading(false);
   };
 
   return (

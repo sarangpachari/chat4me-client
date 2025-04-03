@@ -166,7 +166,7 @@ function ChatArea() {
           )}
         </>
       ) : (
-        <div className="flex flex-col h-full justify-center md:items-center items-start gap-5 p-4 bg-amber-300">
+        <div className="flex flex-col h-full justify-center md:items-center items-start gap-5 p-4 bg-emerald-700">
           <div className="py-3">
             <p className="text-4xl font-bold text-white">
               Select a <span className="text-red-500">chat</span> to start{" "}
